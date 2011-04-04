@@ -65,13 +65,13 @@ private:
 
     static OpenNIObject* m_instance;
 
-    bool m_started;
     bool m_moveDetected;
     bool m_nextShot;
     quint16 m_imageWidth;
     quint16 m_imageHeight;
 
     QTimer* m_timer;
+    bool m_initialized;
 
 };
 

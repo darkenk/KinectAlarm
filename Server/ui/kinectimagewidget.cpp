@@ -15,7 +15,6 @@ KinectImageWidget::KinectImageWidget(IKinect* _kinect, QWidget *_parent) :
     m_animationTimer->setSingleShot(false);
     connect(m_animationTimer, SIGNAL(timeout()), this, SLOT(animate()));
     m_animationTimer->start(25);
-//    setFixedSize(320, 240);
 }
 
 KinectImageWidget::~KinectImageWidget()

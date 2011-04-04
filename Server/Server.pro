@@ -13,14 +13,12 @@ TEMPLATE = app
 INCLUDEPATH += /usr/include/ni ./logic ./ui ./interfaces
 LIBS += -lOpenNI
 
-CONFIG += link_pkgconfig
-PKGCONFIG += opencv
-
 SOURCES += main.cpp\
 	ui/mainwindow.cpp \
 	logic/openniobject.cpp \
     logic/kinectsubject.cpp \
-    ui/kinectimagewidget.cpp
+    ui/kinectimagewidget.cpp \
+    ui/alarmtrayicon.cpp
 
 HEADERS  += ui/mainwindow.h \
     logic/openniobject.h \
@@ -28,7 +26,8 @@ HEADERS  += ui/mainwindow.h \
     logic/kinectsubject.h \
     interfaces/ikinectobservable.h \
     interfaces/ikinect.h \
-    ui/kinectimagewidget.h
+    ui/kinectimagewidget.h \
+    ui/alarmtrayicon.h
 
 FORMS    += ui/mainwindow.ui
 
@@ -36,4 +35,6 @@ RESOURCES += \
     resources.qrc
 
 OTHER_FILES += \
-    config.xml
+    config.xml \
+    home1.png \
+    home_addblocked.png

@@ -20,15 +20,14 @@ OpenNIObject::OpenNIObject(QObject *parent) :
     m_imageMetaData(new xn::ImageMetaData()),
     m_depthMetaData(new xn::DepthMetaData()),
     m_sceneMetaData(new xn::SceneMetaData()),
-    m_started(false),
     m_moveDetected(false),
     m_nextShot(true),
-    m_timer(new QTimer)
+    m_timer(new QTimer),
+    m_initialized(false)
 {
     m_timer->setSingleShot(false);
     m_timer->setInterval(50);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(onFetchDataTimer()));
-    //this->start();
 }
 
 
@@ -36,6 +35,8 @@ OpenNIObject::OpenNIObject(QObject *parent) :
 OpenNIObject::~OpenNIObject()
 {
     m_context->Shutdown();
+    delete m_context;
+
     if (m_rgbImage) {
 	delete[] m_rgbImage;
 	m_rgbImage = NULL;
@@ -45,11 +46,12 @@ OpenNIObject::~OpenNIObject()
 	m_depthImage = NULL;
     }
 
-    delete m_context;
     delete m_depthGenerator;
     delete m_imageGenerator;
     delete m_sceneAnalyzer;
     delete m_imageMetaData;
+    delete m_depthMetaData;
+    delete m_sceneMetaData;
 }
 
 OpenNIObject * OpenNIObject::instance()
@@ -76,7 +78,6 @@ quint8* OpenNIObject::rgbImage()
 
 bool OpenNIObject::startGenerating()
 {
-    m_started = true;
     m_imageGenerator->StartGenerating();
     m_timer->start();
     start();
@@ -85,11 +86,16 @@ bool OpenNIObject::startGenerating()
 
 void OpenNIObject::pauseGenerating()
 {
-    m_started = false;
+    m_imageGenerator->StopGenerating();
+    m_timer->stop();
+    quit();
 }
 
 bool OpenNIObject::initialize()
 {
+    if (m_initialized)
+	return true;
+    m_initialized = true;
     qDebug() << Q_FUNC_INFO;
     xn::EnumerationErrors errors;
     XnStatus rc;
@@ -141,10 +147,6 @@ bool OpenNIObject::initialize()
 void OpenNIObject::run()
 {
     qDebug() << "so we starting";
-    qDebug() << Q_FUNC_INFO << m_started;
-
-
-
     exec();
     qDebug() << Q_FUNC_INFO << "thread finished";
 
@@ -206,10 +208,10 @@ void OpenNIObject::onFetchDataTimer()
     //memcpy(m_depthImage, m_depthMetaData->Data(), m_depthMetaData->DataSize());
     //memcpy(m_sceneImage, m_sceneAnalyzer->GetLabelMap(), m_sceneAnalyzer->GetDataSize());
     createDepthImage((quint8*)m_depthMetaData->Data(), (quint16*)m_sceneAnalyzer->GetLabelMap(), m_imageWidth, m_imageHeight);
+    memcpy(m_rgbImage, m_imageMetaData->Data(), m_imageMetaData->DataSize());
     if (m_moveDetected) {
 	m_moveDetected = false;
 	if (m_nextShot) {
-	    memcpy(m_rgbImage, m_imageMetaData->Data(), m_imageMetaData->DataSize());
 	    notifyAll(m_rgbImage, m_imageWidth, m_imageHeight);
 	    m_nextShot = false;
 	    QTimer::singleShot(1000, this, SLOT(onDelayFinished()));

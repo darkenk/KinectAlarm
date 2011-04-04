@@ -16,5 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    m_kinect->pauseGenerating();
     delete ui;
 }
