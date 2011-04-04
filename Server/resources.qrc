@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/KinectServer">
+        <file>config.xml</file>
+    </qresource>
+</RCC>
