@@ -1,6 +1,9 @@
 #ifndef ALARMTRAYICON_H
 #define ALARMTRAYICON_H
 
+#include "ikinect.h"
+#include "harddrivestorage.h"
+
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QWidget>
@@ -24,15 +27,23 @@ private slots:
 #ifdef KinectAlarmDebug
     void onDebugAction();
 #endif
+    void onSettingsAction();
+    void onStartAction();
 
 private:
+    IKinect* m_kinect;
     QMenu* m_contextMenu;
     QAction* m_quitAction;
 #ifdef KinectAlarmDebug
     QAction* m_debugAction;
     QPointer<QWidget> m_debugWindow;
 #endif
+    QAction* m_settingsAction;
+    QAction* m_startAction;
+    QPointer<QWidget> m_settingsWindow;
 
+    bool m_kinectStarted;
+    HardDriveStorage* m_hardDriveStorage;
 };
 
 #endif // ALARMTRAYICON_H

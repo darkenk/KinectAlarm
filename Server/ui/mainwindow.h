@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 
-#include <openniobject.h>
+#include <ikinect.h>
 #include <kinectimagewidget.h>
 #include <QMainWindow>
 
@@ -15,12 +15,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(IKinect* _kinect, QWidget *parent = 0);
     ~MainWindow();
 
 private:
     Ui::MainWindow *ui;
-    OpenNIObject* m_kinect;
+    IKinect* m_kinect;
     KinectImageWidget* m_kinectWidget;
 };
 

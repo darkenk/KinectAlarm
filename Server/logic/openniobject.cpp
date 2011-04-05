@@ -59,7 +59,7 @@ OpenNIObject * OpenNIObject::instance()
     if (!m_instance) {
 	m_instance = new OpenNIObject();
     }
-    m_instance;
+    return m_instance;
 }
 
 quint8* OpenNIObject::depthImage()

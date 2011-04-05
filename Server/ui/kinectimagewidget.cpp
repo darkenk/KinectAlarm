@@ -32,9 +32,15 @@ void KinectImageWidget::paintGL()
     m_depthHeight = m_kinect->depthImageHeight();
     quint8* rgbImage = m_kinect->rgbImage();
     quint8* depthImage = m_kinect->depthImage();
+
     if (rgbImage == NULL) {
 	qWarning() << Q_FUNC_INFO << " rgbImage is null!";
     }
+
+    if (depthImage == NULL) {
+	qWarning() << Q_FUNC_INFO << " depthImage is null!";
+    }
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
