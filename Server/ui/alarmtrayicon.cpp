@@ -20,12 +20,10 @@ AlarmTrayIcon::AlarmTrayIcon(QObject *_parent) :
     m_settingsAction(new QAction(tr("&Settings"), this)),
     m_startAction(new QAction(tr("S&tart"), this)),
     m_kinectStarted(false),
-    m_hardDriveStorage(new HardDriveStorage(m_kinect))
+    m_hardDriveStorage(new HardDriveStorage(m_kinect, OpenNIObject::instance()))
 {
 
     m_kinect->initialize();
-    OpenNIObject::instance()->addKinectObserver(*m_hardDriveStorage);
-
 
     setIcon(QIcon(":/KinectServer/home1.png"));
 #ifdef KinectAlarmDebug

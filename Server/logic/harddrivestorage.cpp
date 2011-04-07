@@ -5,14 +5,18 @@
 #include <QDir>
 #include <QDateTime>
 #include <QTimerEvent>
+#include <QSettings>
+#include <QVariant>
 #include <QDebug>
 
-HardDriveStorage::HardDriveStorage(IKinect* _kinect, QObject *parent) :
+HardDriveStorage::HardDriveStorage(IKinect* _kinect, IKinectObservable* _kinectObservable, QObject *parent) :
     QObject(parent),
     m_kinect(_kinect),
+    m_kinectObservable(_kinectObservable),
     m_directoryPath("./"),
     m_firstDelay(500),
     m_repeatableDelay(2),
+    m_storageActive(false),
     m_nextImageLaunch(false),
     m_firstImageLaunch(false),
     m_firstImageTook(false),
@@ -21,6 +25,7 @@ HardDriveStorage::HardDriveStorage(IKinect* _kinect, QObject *parent) :
     m_imageWidth(-1),
     m_imageHeight(-1)
 {
+    loadFromFile();
 }
 
 HardDriveStorage::~HardDriveStorage()
@@ -92,4 +97,31 @@ void HardDriveStorage::saveImage()
     //QDateTime dateTime = QDateTime::currentDateTime();
     //fileName.append(dateTime.
     image.save(fileName, "PNG");
+}
+
+void HardDriveStorage::loadFromFile()
+{
+    QSettings settings;
+    QVariant var;
+    settings.beginGroup("HardDriveStorage");
+    var = settings.value("directory_path", QVariant(m_directoryPath));
+    setDirectoryPath(var.toString());
+    var = settings.value("first_delay", QVariant(m_firstDelay));
+    setFirstDelay(var.toInt());
+    var = settings.value("next_delay", QVariant(m_repeatableDelay));
+    setRepeatableDelay(var.toDouble());
+    var = settings.value("storage_active", QVariant(m_storageActive));
+    setStorageActive(var.toBool());
+    settings.endGroup();
+}
+
+void HardDriveStorage::saveToFile()
+{
+    QSettings settings;
+    settings.beginGroup("HardDriveStorage");
+    settings.setValue("directory_path", QVariant(m_directoryPath));
+    settings.setValue("first_delay", QVariant(m_firstDelay));
+    settings.setValue("next_delay", QVariant(m_repeatableDelay));
+    settings.setValue("storage_active", QVariant(m_storageActive));
+    settings.endGroup();
 }

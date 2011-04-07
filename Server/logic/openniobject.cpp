@@ -1,10 +1,11 @@
 #include "openniobject.h"
 
 #include <QApplication>
-#include <QDebug>
 #include <QFile>
 #include <QTimer>
 #include <QTimerEvent>
+#include <QSettings>
+#include <QDebug>
 
 OpenNIObject* OpenNIObject::m_instance = NULL;
 
@@ -93,13 +94,26 @@ void OpenNIObject::pauseGenerating()
 
 bool OpenNIObject::initialize()
 {
+    qDebug() << Q_FUNC_INFO;
     if (m_initialized)
 	return true;
+
     m_initialized = true;
-    qDebug() << Q_FUNC_INFO;
+#ifdef Q_WS_X11
+    QFile configXml;
+    QString path(qgetenv("HOME"));
+    path.append("/.config/").append(QApplication::organizationName()).append("/OpenNIconfig.xml");
+    configXml.setFileName(path);
+    if (!configXml.exists()) {
+	QFile qrcFile(":/KinectServer/config.xml");
+	qDebug() << Q_FUNC_INFO << qrcFile.copy(configXml.fileName());
+    }
+#elif Q_WS_WIN
+    //TODO: Implement functionality for windows
+#endif
     xn::EnumerationErrors errors;
     XnStatus rc;
-    rc = m_context->InitFromXmlFile("/home/darken/workspace/qt/KinectOpenNi/Server/config.xml", &errors);
+    rc = m_context->InitFromXmlFile(configXml.fileName().toAscii(), &errors);
     if (rc == XN_STATUS_NO_NODE_PRESENT) {
 	XnChar strError[1024];
 	errors.ToString(strError,  1024);

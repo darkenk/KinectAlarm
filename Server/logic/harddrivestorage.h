@@ -2,6 +2,7 @@
 #define HARDDRIVESTORAGE_H
 
 #include "ikinectobserver.h"
+#include "ikinectobservable.h"
 #include "ikinect.h"
 
 #include <QObject>
@@ -11,7 +12,7 @@ class HardDriveStorage : public QObject, public IKinectObserver
 {
     Q_OBJECT
 public:
-    HardDriveStorage(IKinect* _kinect, QObject *parent = 0);
+    HardDriveStorage(IKinect* _kinect, IKinectObservable* _kinectObservable, QObject *parent = 0);
     virtual ~HardDriveStorage();
 
     void setDirectoryPath(const QString& _path) { m_directoryPath = _path; }
@@ -22,6 +23,12 @@ public:
 
     void setRepeatableDelay(double _sec) { m_repeatableDelay = _sec; }
     double repeatableDelay() { return m_repeatableDelay; }
+
+    void loadFromFile();
+    void saveToFile();
+
+    void setStorageActive(bool _active) { m_storageActive = _active; if (_active)  m_kinectObservable->addKinectObserver(*this); else m_kinectObservable->removeKinectObserver(*this); }
+    bool storageActive() { return m_storageActive; }
 
 
 signals:
@@ -38,9 +45,11 @@ private slots:
 private:
     void saveImage();
     IKinect* m_kinect;
+    IKinectObservable* m_kinectObservable;
     QString m_directoryPath;
     int m_firstDelay;
     double m_repeatableDelay;
+    bool m_storageActive;
 
     bool m_nextImageLaunch;
     bool m_firstImageLaunch;

@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QMessageBox>
+#include <QSettings>
 
 SettingsDialog::SettingsDialog(IKinect* _kinect, HardDriveStorage* _hardDriveStorage, QWidget *_parent) :
     QDialog(_parent),
@@ -14,6 +15,10 @@ SettingsDialog::SettingsDialog(IKinect* _kinect, HardDriveStorage* _hardDriveSto
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
+    ui->path->setText(m_storage->directoryPath());
+    ui->firstImageSpinBox->setValue(m_storage->firstDelay());
+    ui->nextImageSpinBox->setValue(m_storage->repeatableDelay());
+    ui->storageActive->setCheckState(m_storage->storageActive() ? Qt::Checked : Qt::Unchecked);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -45,14 +50,18 @@ void SettingsDialog::on_pathChooser_clicked()
 
 void SettingsDialog::on_buttonBox_accepted()
 {
-    QDir dir(ui->path->text());
-    if (!dir.exists()) {
-	QMessageBox::warning(this, tr("Error"), tr("Specified image path is invalid"));
-	return;
+    m_storage->setStorageActive((bool)ui->storageActive->checkState());
+    if (m_storage->storageActive()) {
+	QDir dir(ui->path->text());
+	if (!dir.exists()) {
+	    QMessageBox::warning(this, tr("Error"), tr("Specified image path is invalid"));
+	    return;
+	}
+	m_storage->setDirectoryPath(ui->path->text());
+	m_storage->setFirstDelay(ui->firstImageSpinBox->value());
+	m_storage->setRepeatableDelay(ui->nextImageSpinBox->value());
     }
-    m_storage->setDirectoryPath(ui->path->text());
-    m_storage->setFirstDelay(ui->firstImageSpinBox->value());
-    m_storage->setRepeatableDelay(ui->nextImageSpinBox->value());
+    m_storage->saveToFile();
     close();
 }
 
