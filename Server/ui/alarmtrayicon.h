@@ -3,6 +3,7 @@
 
 #include "ikinect.h"
 #include "harddrivestorage.h"
+#include "kinectpluginloader.h"
 
 #include <QSystemTrayIcon>
 #include <QMenu>
@@ -29,6 +30,10 @@ private slots:
 #endif
     void onSettingsAction();
     void onStartAction();
+    void onKinectPluginChange(IKinect* _kinect);
+
+private:
+    void loadSettings();
 
 private:
     IKinect* m_kinect;
@@ -43,7 +48,9 @@ private:
     QPointer<QWidget> m_settingsWindow;
 
     bool m_kinectStarted;
+    KinectPluginLoader* m_kinectPluginLoader;
     HardDriveStorage* m_hardDriveStorage;
+
 };
 
 #endif // ALARMTRAYICON_H

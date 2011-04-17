@@ -2,6 +2,7 @@
 #define SETTINGSDIALOG_H
 
 #include "harddrivestorage.h"
+#include "kinectpluginloader.h"
 #include "ikinect.h"
 
 #include <QDialog>
@@ -15,7 +16,7 @@ class SettingsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SettingsDialog(IKinect* _kinect, HardDriveStorage* _hardDriveStorage, QWidget *_parent = 0);
+    explicit SettingsDialog(HardDriveStorage* _hardDriveStorage, KinectPluginLoader* _kinectPluginLoader, QWidget *_parent = 0);
     ~SettingsDialog();
 
 private slots:
@@ -31,6 +32,7 @@ private:
     Ui::SettingsDialog *ui;
     IKinect* m_kinect;
     HardDriveStorage* m_storage;
+    KinectPluginLoader* m_kinectPluginLoader;
 };
 
 #endif // SETTINGSDIALOG_H

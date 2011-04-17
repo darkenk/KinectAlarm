@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="kinectSettings">
     <property name="accessibleName">
@@ -38,6 +38,42 @@
     <attribute name="title">
      <string>Kinect</string>
     </attribute>
+    <widget class="QCheckBox" name="launchKinectAfterStart">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>371</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Start motion detection after launching KinectAlarm</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="pluginComboBox">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>35</y>
+       <width>181</width>
+       <height>27</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>171</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Motion detection plugin</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="storageSettings">
     <attribute name="title">

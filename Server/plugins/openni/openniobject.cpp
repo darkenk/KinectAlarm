@@ -2,12 +2,13 @@
 
 #include <QApplication>
 #include <QFile>
+#include <QDir>
 #include <QTimer>
 #include <QTimerEvent>
 #include <QSettings>
 #include <QDebug>
 
-OpenNIObject* OpenNIObject::m_instance = NULL;
+//OpenNIObject* OpenNIObject::m_instance = NULL;
 
 OpenNIObject::OpenNIObject(QObject *parent) :
     QThread(parent),
@@ -35,8 +36,7 @@ OpenNIObject::OpenNIObject(QObject *parent) :
 
 OpenNIObject::~OpenNIObject()
 {
-    m_context->Shutdown();
-    delete m_context;
+    deinitialize();
 
     if (m_rgbImage) {
 	delete[] m_rgbImage;
@@ -55,13 +55,13 @@ OpenNIObject::~OpenNIObject()
     delete m_sceneMetaData;
 }
 
-OpenNIObject * OpenNIObject::instance()
-{
-    if (!m_instance) {
-	m_instance = new OpenNIObject();
-    }
-    return m_instance;
-}
+//OpenNIObject * OpenNIObject::instance()
+//{
+//    if (!m_instance) {
+//	m_instance = new OpenNIObject();
+//    }
+//    return m_instance;
+//}
 
 quint8* OpenNIObject::depthImage()
 {
@@ -98,13 +98,19 @@ bool OpenNIObject::initialize()
     if (m_initialized)
 	return true;
 
-    m_initialized = true;
 #ifdef Q_WS_X11
     QFile configXml;
     QString path(qgetenv("HOME"));
-    path.append("/.config/").append(QApplication::organizationName()).append("/OpenNIconfig.xml");
-    configXml.setFileName(path);
+    path.append("/.config/").append(QApplication::organizationName());
+    QDir dir;
+    dir.setPath(path);
+    if (!dir.exists()) {
+	dir.mkpath(path);
+    }
+
+    configXml.setFileName(path.append("/OpenNIconfig.xml"));
     if (!configXml.exists()) {
+
 	QFile qrcFile(":/KinectServer/config.xml");
 	qDebug() << Q_FUNC_INFO << qrcFile.copy(configXml.fileName());
     }
@@ -114,36 +120,19 @@ bool OpenNIObject::initialize()
     xn::EnumerationErrors errors;
     XnStatus rc;
     rc = m_context->InitFromXmlFile(configXml.fileName().toAscii(), &errors);
-    if (rc == XN_STATUS_NO_NODE_PRESENT) {
-	XnChar strError[1024];
-	errors.ToString(strError,  1024);
-	qDebug() << Q_FUNC_INFO << strError;
-    } else  if (rc != XN_STATUS_OK) {
-	qDebug() << Q_FUNC_INFO << "Something is wrong";
-    }
-   rc = m_context->FindExistingNode(XN_NODE_TYPE_DEPTH, *m_depthGenerator);
-    if (rc == XN_STATUS_NO_NODE_PRESENT) {
-	XnChar strError[1024];
-	errors.ToString(strError,  1024);
-	qDebug() << Q_FUNC_INFO << strError;
-    } else  if (rc != XN_STATUS_OK) {
-	qDebug() << Q_FUNC_INFO << "Something is wrong";
+    if (!checkError(rc, errors))
+	return false;
+    rc = m_context->FindExistingNode(XN_NODE_TYPE_DEPTH, *m_depthGenerator);
+    if (!checkError(rc, errors)) {
+	return false;
     }
     rc = m_context->FindExistingNode(XN_NODE_TYPE_IMAGE, *m_imageGenerator);
-    if (rc == XN_STATUS_NO_NODE_PRESENT) {
-	XnChar strError[1024];
-	errors.ToString(strError,  1024);
-	qDebug() << Q_FUNC_INFO << strError;
-    } else  if (rc != XN_STATUS_OK) {
-	qDebug() << Q_FUNC_INFO << "Something is wrong";
+    if (!checkError(rc, errors)) {
+	return false;
     }
     rc = m_context->FindExistingNode(XN_NODE_TYPE_SCENE, *m_sceneAnalyzer);
-    if (rc == XN_STATUS_NO_NODE_PRESENT) {
-	XnChar strError[1024];
-	errors.ToString(strError,  1024);
-	qDebug() << Q_FUNC_INFO << strError;
-    } else  if (rc != XN_STATUS_OK) {
-	qDebug() << Q_FUNC_INFO << "Something is wrong";
+    if (!checkError(rc, errors)) {
+	return false;
     }
     m_imageGenerator->GetMetaData(*m_imageMetaData);
     m_depthGenerator->GetMetaData(*m_depthMetaData);
@@ -155,6 +144,7 @@ bool OpenNIObject::initialize()
     qDebug() << Q_FUNC_INFO << " depthGeneratorSize " << m_depthMetaData->DataSize();
     m_sceneImage = new quint16[m_sceneAnalyzer->GetDataSize()/2];
     m_depthImage = new quint8[m_imageWidth * m_imageHeight * 3];
+    m_initialized = true;
     return true;
 }
 
@@ -233,3 +223,47 @@ void OpenNIObject::onFetchDataTimer()
     }
     m_mutex.unlock();
 }
+
+QString OpenNIObject::pluginName()
+{
+    return "OpenNIKinect plugin";
+}
+
+void OpenNIObject::deinitialize()
+{
+    pauseGenerating();
+    m_context->Shutdown();
+    delete m_context;
+}
+
+void OpenNIObject::addKinectObserver(IKinectObserver &_observer)
+{
+    m_observersList.append(&_observer);
+}
+
+bool OpenNIObject::removeKinectObserver(IKinectObserver &_observer)
+{
+    return m_observersList.removeOne(&_observer);
+}
+
+void OpenNIObject::notifyAll(quint8 *_data, int _width, int _height)
+{
+    foreach (IKinectObserver *observer, m_observersList) {
+	observer->moveDetected(_data, _width, _height);
+    }
+}
+
+bool OpenNIObject::checkError(XnStatus _result, xn::EnumerationErrors _errors) {
+    if (_result == XN_STATUS_NO_NODE_PRESENT) {
+	XnChar strError[1024];
+	_errors.ToString(strError,  1024);
+	qDebug() << Q_FUNC_INFO << strError;
+	return false;
+    } else  if (_result != XN_STATUS_OK) {
+	qDebug() << Q_FUNC_INFO << "Something is wrong";
+	return false;
+    }
+    return true;
+}
+
+Q_EXPORT_PLUGIN2(openni_plugin, OpenNIObject)

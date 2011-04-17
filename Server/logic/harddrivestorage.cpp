@@ -9,10 +9,10 @@
 #include <QVariant>
 #include <QDebug>
 
-HardDriveStorage::HardDriveStorage(IKinect* _kinect, IKinectObservable* _kinectObservable, QObject *parent) :
-    QObject(parent),
-    m_kinect(_kinect),
-    m_kinectObservable(_kinectObservable),
+HardDriveStorage::HardDriveStorage(KinectPluginLoader* _kinectPluginLoader, QObject *_parent) :
+    QObject(_parent),
+    m_kinect(0),
+    m_kinectPluginLoader(_kinectPluginLoader),
     m_directoryPath("./"),
     m_firstDelay(500),
     m_repeatableDelay(2),
@@ -26,6 +26,8 @@ HardDriveStorage::HardDriveStorage(IKinect* _kinect, IKinectObservable* _kinectO
     m_imageHeight(-1)
 {
     loadFromFile();
+    connect(_kinectPluginLoader, SIGNAL(newKinectEngine(IKinect*)), this, SLOT(onKinectChanged(IKinect*)));
+    onKinectChanged(_kinectPluginLoader->plugin());
 }
 
 HardDriveStorage::~HardDriveStorage()
@@ -86,6 +88,8 @@ void HardDriveStorage::saveNextImage()
 
 void HardDriveStorage::saveImage()
 {
+    if (!m_kinect)
+	return;
     QDir dir(m_directoryPath);
     if (!dir.exists()) {
 	qWarning() << Q_FUNC_INFO << " Directory path doesn't exists";
@@ -124,4 +128,15 @@ void HardDriveStorage::saveToFile()
     settings.setValue("next_delay", QVariant(m_repeatableDelay));
     settings.setValue("storage_active", QVariant(m_storageActive));
     settings.endGroup();
+}
+
+void HardDriveStorage::onKinectChanged(IKinect *_kinect)
+{
+    qDebug() << Q_FUNC_INFO;
+    if (!_kinect)
+	return;
+    if (m_kinect)
+	m_kinect->removeKinectObserver(*this);
+    m_kinect = _kinect;
+    m_kinect->addKinectObserver(*this);
 }

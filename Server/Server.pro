@@ -11,19 +11,20 @@ TEMPLATE = app
 
 
 INCLUDEPATH += /usr/include/ni ./logic ./ui ./interfaces
-LIBS += -lOpenNI
+#LIBS += -lOpenNI
 
 SOURCES += main.cpp\
 	ui/mainwindow.cpp \
-	logic/openniobject.cpp \
+#	logic/openniobject.cpp \
     logic/kinectsubject.cpp \
     ui/kinectimagewidget.cpp \
     ui/alarmtrayicon.cpp \
     ui/settingsdialog.cpp \
-    logic/harddrivestorage.cpp
+    logic/harddrivestorage.cpp \
+    logic/kinectpluginloader.cpp
 
 HEADERS  += ui/mainwindow.h \
-    logic/openniobject.h \
+#    logic/openniobject.h \
     interfaces/ikinectobserver.h \
     logic/kinectsubject.h \
     interfaces/ikinectobservable.h \
@@ -31,7 +32,8 @@ HEADERS  += ui/mainwindow.h \
     ui/kinectimagewidget.h \
     ui/alarmtrayicon.h \
     ui/settingsdialog.h \
-    logic/harddrivestorage.h
+    logic/harddrivestorage.h \
+    logic/kinectpluginloader.h
 
 FORMS    += ui/mainwindow.ui \
     ui/settingsdialog.ui

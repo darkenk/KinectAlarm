@@ -1,9 +1,8 @@
 #ifndef OPENNIOBJECT_H
 #define OPENNIOBJECT_H
 
-#include <kinectsubject.h>
-#include <interfaces/ikinectobserver.h>
-#include <interfaces/ikinect.h>
+#include <ikinectobserver.h>
+#include <ikinect.h>
 
 #include <XnCppWrapper.h>
 #include <opencv/cv.h>
@@ -12,13 +11,17 @@
 #include <QThread>
 #include <QTimer>
 
-class OpenNIObject : public QThread, public KinectSubject, public IKinect
+class OpenNIObject : public QThread, public IKinect
 {
     Q_OBJECT
+    Q_INTERFACES(IKinect)
+
 public:
+    OpenNIObject(QObject *parent = 0);
     ~OpenNIObject();
 
-    static OpenNIObject* instance();
+
+    //static OpenNIObject* instance();
 
     quint8* depthImage();
     quint8* rgbImage();
@@ -30,6 +33,13 @@ public:
     bool startGenerating();
     void pauseGenerating();
     bool initialize();
+    void deinitialize();
+
+    void addKinectObserver(IKinectObserver &_observer);
+    bool removeKinectObserver(IKinectObserver &_observer);
+
+
+    QString pluginName();
 
 
 signals:
@@ -42,12 +52,14 @@ private slots:
 
 protected:
     void run();
+    void notifyAll(quint8 *_data, int _width, int _height);
+
 
 private:
     void createDepthImage(quint8* _depthImage, quint16* _mask, quint16 _width, quint16 _height);
+    bool checkError(XnStatus _result, xn::EnumerationErrors _errors);
 
     Q_DISABLE_COPY(OpenNIObject)
-    OpenNIObject(QObject *parent = 0);
     XnStatus m_xnStatus;
     xn::Context* m_context;
     xn::DepthGenerator* m_depthGenerator;
@@ -63,7 +75,7 @@ private:
     xn::SceneMetaData* m_sceneMetaData;
 
 
-    static OpenNIObject* m_instance;
+    //static OpenNIObject* m_instance;
 
     bool m_moveDetected;
     bool m_nextShot;
@@ -72,6 +84,8 @@ private:
 
     QTimer* m_timer;
     bool m_initialized;
+
+    QList< IKinectObserver* > m_observersList;
 
 };
 

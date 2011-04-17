@@ -1,8 +1,8 @@
 #ifndef KINECTSUBJECT_H
 #define KINECTSUBJECT_H
 
-#include <interfaces/ikinectobservable.h>
-#include <interfaces/ikinectobserver.h>
+#include <ikinectobservable.h>
+#include <ikinectobserver.h>
 
 #include <QList>
 

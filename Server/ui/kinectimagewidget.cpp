@@ -7,10 +7,10 @@ KinectImageWidget::KinectImageWidget(IKinect* _kinect, QWidget *_parent) :
     QGLWidget(_parent),
     m_kinect(_kinect),
     m_animationTimer(new QTimer),
-    m_rgbWidth(320),
-    m_rgbHeight(240),
-    m_depthWidth(320),
-    m_depthHeight(240)
+    m_rgbWidth(640),
+    m_rgbHeight(480),
+    m_depthWidth(640),
+    m_depthHeight(480)
 {
     m_animationTimer->setSingleShot(false);
     connect(m_animationTimer, SIGNAL(timeout()), this, SLOT(animate()));

@@ -4,6 +4,7 @@
 #include "ikinectobserver.h"
 #include "ikinectobservable.h"
 #include "ikinect.h"
+#include "kinectpluginloader.h"
 
 #include <QObject>
 #include <QString>
@@ -12,7 +13,7 @@ class HardDriveStorage : public QObject, public IKinectObserver
 {
     Q_OBJECT
 public:
-    HardDriveStorage(IKinect* _kinect, IKinectObservable* _kinectObservable, QObject *parent = 0);
+    HardDriveStorage(KinectPluginLoader* _kinect, QObject *_parent = 0);
     virtual ~HardDriveStorage();
 
     void setDirectoryPath(const QString& _path) { m_directoryPath = _path; }
@@ -27,7 +28,7 @@ public:
     void loadFromFile();
     void saveToFile();
 
-    void setStorageActive(bool _active) { m_storageActive = _active; if (_active)  m_kinectObservable->addKinectObserver(*this); else m_kinectObservable->removeKinectObserver(*this); }
+    void setStorageActive(bool _active) { m_storageActive = _active; if (m_kinect) {if (_active)  m_kinect->addKinectObserver(*this); else m_kinect->removeKinectObserver(*this);} }
     bool storageActive() { return m_storageActive; }
 
 
@@ -38,6 +39,8 @@ protected:
     void timerEvent(QTimerEvent *_evt);
 
 public slots:
+    void onKinectChanged(IKinect* _kinect);
+
 private slots:
     void saveFirstImage();
     void saveNextImage();
@@ -45,7 +48,7 @@ private slots:
 private:
     void saveImage();
     IKinect* m_kinect;
-    IKinectObservable* m_kinectObservable;
+    KinectPluginLoader* m_kinectPluginLoader;
     QString m_directoryPath;
     int m_firstDelay;
     double m_repeatableDelay;
