@@ -72,7 +72,7 @@ void PicasaStorage::onReplyFinished(QNetworkReply *_reply)
 	if (_reply->error() == QNetworkReply::NoError) {
 
 	    if (!checkKinectFolderExistence(content)) {
-		qDebug() << "requestCreatingKinectAlar,";
+		qDebug() << "requestCreatingKinectAlarm";
 		requestCreatingKinectAlarmAlbum();
 	    } else {
 		saveToFile();
@@ -84,7 +84,11 @@ void PicasaStorage::onReplyFinished(QNetworkReply *_reply)
 	m_albumRequest = 0;
     } else if ((m_sendImageRequest) && (_reply->request().url() == m_sendImageRequest->url())) {
 	qDebug() << "SendRequest";
+	INFO(_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt());
 	//TODO: should i check if something goes wrong? probably yes, but i'm too lazy
+	if (_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 404 ) {
+	    requestCreatingKinectAlarmAlbum();
+	}
 	delete m_sendImageRequest;
 	m_sendImageRequest = 0;
 	if (!m_pendingData.isEmpty()) {
@@ -94,8 +98,9 @@ void PicasaStorage::onReplyFinished(QNetworkReply *_reply)
 	    m_pendingData.removeFirst();
 	}
     } else if ((m_createAlbumRequest) && _reply->request().url() == m_createAlbumRequest->url()) {
-	qDebug() << "createAlbum";
-	qDebug() << _reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+	INFO("createAlbum");
+	INFO(_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute));
+	checkKinectFolderExistence(content);
 	delete m_createAlbumRequest;
 	m_createAlbumRequest = 0;
 
