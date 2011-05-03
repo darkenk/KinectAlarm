@@ -4,6 +4,8 @@
 #include "harddrivestorage.h"
 #include "kinectpluginloader.h"
 #include "ikinect.h"
+#include "storage.h"
+#include "picasastorage.h"
 
 #include <QDialog>
 
@@ -16,7 +18,7 @@ class SettingsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SettingsDialog(HardDriveStorage* _hardDriveStorage, KinectPluginLoader* _kinectPluginLoader, QWidget *_parent = 0);
+    explicit SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStorage, KinectPluginLoader* _kinectPluginLoader,  QWidget *_parent = 0);
     ~SettingsDialog();
 
 private slots:
@@ -28,10 +30,13 @@ private slots:
 
     void on_buttonBox_rejected();
 
+    void on_picasaStorageActive_toggled(bool checked);
+
 private:
     Ui::SettingsDialog *ui;
     IKinect* m_kinect;
-    HardDriveStorage* m_storage;
+    Storage* m_hardDriveStorage;
+    Storage* m_picasaStorage;
     KinectPluginLoader* m_kinectPluginLoader;
 };
 

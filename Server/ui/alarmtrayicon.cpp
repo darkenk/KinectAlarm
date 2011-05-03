@@ -5,6 +5,7 @@
 #include "mainwindow.h"
 #endif
 
+#include <QMessageBox>
 #include <QApplication>
 #include <QSettings>
 #include <QDebug>
@@ -20,19 +21,14 @@ AlarmTrayIcon::AlarmTrayIcon(QObject *_parent) :
     m_settingsAction(new QAction(tr("&Settings"), this)),
     m_startAction(new QAction(tr("S&tart"), this)),
     m_kinectStarted(false),
-    m_kinectPluginLoader(new KinectPluginLoader(this)),
-    m_hardDriveStorage(new HardDriveStorage(m_kinectPluginLoader,this))
+    m_kinectPluginLoader(new KinectPluginLoader(this))
 {
+    HardDriveStorage* hds = new HardDriveStorage(this);
+    PicasaStorage* ps = new PicasaStorage(this);
+    m_hardDriveStorage = new Storage(m_kinectPluginLoader, hds,this);
+    m_picasaStorage = new Storage(m_kinectPluginLoader, ps, this);
     connect(m_kinectPluginLoader, SIGNAL(newKinectEngine(IKinect*)), this, SLOT(onKinectPluginChange(IKinect*)));
     onKinectPluginChange(m_kinectPluginLoader->plugin());
-//    QList<QString> plugins = m_kinectPluginLoader->loadPlugins();
-//    if (!plugins.isEmpty()) {
-//	m_pluginName = plugins.at(0);
-//    } else {
-//	//TODO: error message and quit the app
-//    }
-
-
 
     setIcon(QIcon(":/KinectServer/home1.png"));
 #ifdef KinectAlarmDebug
@@ -65,6 +61,9 @@ void AlarmTrayIcon::onQuitAction()
 void AlarmTrayIcon::onDebugAction()
 {
     qDebug() << Q_FUNC_INFO;
+    if (!m_kinect) {
+	QMessageBox::warning(NULL, tr("Kinect not set"), tr("Please choose plugin first"));
+    }
     if (!m_debugWindow) {
 	m_debugWindow = new MainWindow(m_kinect);
 	m_debugWindow->show();
@@ -79,7 +78,7 @@ void AlarmTrayIcon::onSettingsAction()
 {
     qDebug() << Q_FUNC_INFO;
     if (!m_settingsWindow) {
-	m_settingsWindow = new SettingsDialog(m_hardDriveStorage, m_kinectPluginLoader);
+	m_settingsWindow = new SettingsDialog(m_hardDriveStorage, m_picasaStorage, m_kinectPluginLoader);
 	m_settingsWindow->show();
     } else {
 	m_settingsWindow->show();
@@ -102,5 +101,9 @@ void AlarmTrayIcon::onStartAction()
 
 void AlarmTrayIcon::onKinectPluginChange(IKinect* _kinect)
 {
+    if (!_kinect) {
+	m_startAction->setDisabled(true);
+    }
     m_kinect = _kinect;
 }
+

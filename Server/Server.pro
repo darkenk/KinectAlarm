@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl thread
+QT       += core gui opengl thread network xml
 
 TARGET = Server
 TEMPLATE = app
@@ -21,7 +21,9 @@ SOURCES += main.cpp\
     ui/alarmtrayicon.cpp \
     ui/settingsdialog.cpp \
     logic/harddrivestorage.cpp \
-    logic/kinectpluginloader.cpp
+    logic/kinectpluginloader.cpp \
+    logic/picasastorage.cpp \
+    logic/storage.cpp
 
 HEADERS  += ui/mainwindow.h \
 #    logic/openniobject.h \
@@ -33,7 +35,10 @@ HEADERS  += ui/mainwindow.h \
     ui/alarmtrayicon.h \
     ui/settingsdialog.h \
     logic/harddrivestorage.h \
-    logic/kinectpluginloader.h
+    logic/kinectpluginloader.h \
+    logic/picasastorage.h \
+    logic/storage.h \
+    interfaces/ikinectstorage.h
 
 FORMS    += ui/mainwindow.ui \
     ui/settingsdialog.ui

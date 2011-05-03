@@ -7,21 +7,29 @@
 #include <QMessageBox>
 #include <QSettings>
 
-SettingsDialog::SettingsDialog(HardDriveStorage* _hardDriveStorage, KinectPluginLoader* _kinectPluginLoader, QWidget *_parent) :
+SettingsDialog::SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStorage, KinectPluginLoader* _kinectPluginLoader, QWidget *_parent) :
     QDialog(_parent),
     ui(new Ui::SettingsDialog),
     m_kinect(_kinectPluginLoader->plugin()),
-    m_storage(_hardDriveStorage),
+    m_hardDriveStorage(_hardDriveStorage),
+    m_picasaStorage(_picasaStorage),
     m_kinectPluginLoader(_kinectPluginLoader)
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
-    ui->path->setText(m_storage->directoryPath());
-    ui->firstImageSpinBox->setValue(m_storage->firstDelay());
-    ui->nextImageSpinBox->setValue(m_storage->repeatableDelay());
-    ui->storageActive->setCheckState(m_storage->storageActive() ? Qt::Checked : Qt::Unchecked);
+    ui->path->setText(dynamic_cast<HardDriveStorage*>(m_hardDriveStorage->storageImpl())->directoryPath());
+    ui->firstImageSpinBox->setValue(m_hardDriveStorage->firstDelay());
+    ui->nextImageSpinBox->setValue(m_hardDriveStorage->repeatableDelay());
+    ui->storageActive->setCheckState(m_hardDriveStorage->storageActive() ? Qt::Checked : Qt::Unchecked);
     QList<QString> plugins = m_kinectPluginLoader->pluginsList();
     ui->pluginComboBox->insertItems(0, plugins);
+    ui->picasaStorageActive->setCheckState(m_picasaStorage->storageActive() ? Qt::Checked : Qt::Unchecked);
+    ui->picasaFirstImageSpinBox->setValue(m_picasaStorage->firstDelay());
+    ui->picasaNextImageSpinBox->setValue(m_picasaStorage->repeatableDelay());
+    PicasaStorage* ps = dynamic_cast<PicasaStorage*>(m_picasaStorage->storageImpl());
+    ui->picasaLogin->setText(ps->login());
+    ui->picasaPassword->setText(ps->password());
+
 
 }
 
@@ -56,22 +64,49 @@ void SettingsDialog::on_buttonBox_accepted()
 {
     m_kinect = m_kinectPluginLoader->setPlugin(ui->pluginComboBox->currentText());
     m_kinectPluginLoader->saveSettings();
-    m_storage->setStorageActive((bool)ui->storageActive->checkState());
-    if (m_storage->storageActive()) {
+    m_hardDriveStorage->setStorageActive((bool)ui->storageActive->checkState());
+    if (m_hardDriveStorage->storageActive()) {
 	QDir dir(ui->path->text());
 	if (!dir.exists()) {
 	    QMessageBox::warning(this, tr("Error"), tr("Specified image path is invalid"));
 	    return;
 	}
-	m_storage->setDirectoryPath(ui->path->text());
-	m_storage->setFirstDelay(ui->firstImageSpinBox->value());
-	m_storage->setRepeatableDelay(ui->nextImageSpinBox->value());
+	dynamic_cast<HardDriveStorage*>(m_hardDriveStorage->storageImpl())->setDirectoryPath(ui->path->text());
+	m_hardDriveStorage->setFirstDelay(ui->firstImageSpinBox->value());
+	m_hardDriveStorage->setRepeatableDelay(ui->nextImageSpinBox->value());
     }
-    m_storage->saveToFile();
+    m_hardDriveStorage->saveToFile();
+    dynamic_cast<HardDriveStorage*>(m_hardDriveStorage->storageImpl())->saveToFile();
+    PicasaStorage* ps = dynamic_cast<PicasaStorage*>(m_picasaStorage->storageImpl());
+    m_picasaStorage->setStorageActive((bool)ui->picasaStorageActive->checkState());
+    if (m_picasaStorage->storageActive()) {
+	m_picasaStorage->setFirstDelay(ui->picasaFirstImageSpinBox->value());
+	m_picasaStorage->setRepeatableDelay(ui->picasaNextImageSpinBox->value());
+	ps->setLogin(ui->picasaLogin->text());
+	ps->setPassword(ui->picasaPassword->text());
+    }
+    m_picasaStorage->saveToFile();
+    ps->saveToFile();
+    if (ps->password().length() != 0)
+	ps->requestAuth();
     close();
 }
 
 void SettingsDialog::on_buttonBox_rejected()
 {
     close();
+}
+
+void SettingsDialog::on_picasaStorageActive_toggled(bool checked)
+{
+    ui->label_7->setEnabled(checked);
+    ui->label_8->setEnabled(checked);
+    ui->label_9->setEnabled(checked);
+    ui->label_10->setEnabled(checked);
+    ui->label_11->setEnabled(checked);
+    ui->label_12->setEnabled(checked);
+    ui->picasaFirstImageSpinBox->setEnabled(checked);
+    ui->picasaNextImageSpinBox->setEnabled(checked);
+    ui->picasaLogin->setEnabled(checked);
+    ui->picasaPassword->setEnabled(checked);
 }

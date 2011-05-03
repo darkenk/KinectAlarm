@@ -5,7 +5,6 @@
 #include <ikinect.h>
 
 #include <XnCppWrapper.h>
-#include <opencv/cv.h>
 #include <QObject>
 #include <QMutex>
 #include <QThread>
@@ -57,7 +56,7 @@ protected:
 
 private:
     void createDepthImage(quint8* _depthImage, quint16* _mask, quint16 _width, quint16 _height);
-    bool checkError(XnStatus _result, xn::EnumerationErrors _errors);
+    bool checkError(XnStatus& _result, xn::EnumerationErrors& _errors);
 
     Q_DISABLE_COPY(OpenNIObject)
     XnStatus m_xnStatus;
@@ -65,7 +64,7 @@ private:
     xn::DepthGenerator* m_depthGenerator;
     xn::ImageGenerator* m_imageGenerator;
     xn::SceneAnalyzer* m_sceneAnalyzer;
-    QList<IKinectObserver*> m_kinectObserverList;
+    //QList<IKinectObserver*> m_kinectObserverList;
     quint8* m_depthImage;
     quint8* m_rgbImage;
     quint16* m_sceneImage;

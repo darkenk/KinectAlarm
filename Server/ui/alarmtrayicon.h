@@ -3,6 +3,8 @@
 
 #include "ikinect.h"
 #include "harddrivestorage.h"
+#include "storage.h"
+#include "picasastorage.h"
 #include "kinectpluginloader.h"
 
 #include <QSystemTrayIcon>
@@ -49,7 +51,9 @@ private:
 
     bool m_kinectStarted;
     KinectPluginLoader* m_kinectPluginLoader;
-    HardDriveStorage* m_hardDriveStorage;
+    Storage* m_hardDriveStorage;
+    Storage* m_picasaStorage;
+
 
 };
 

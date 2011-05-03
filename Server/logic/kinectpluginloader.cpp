@@ -80,6 +80,9 @@ IKinect* KinectPluginLoader::setPlugin(QString _pluginName)
     if (!newKinect)
 	return newKinect; // return null if no such plugin
 
+    if ((m_kinect) && (m_kinect->pluginName() == _pluginName))
+	return m_kinect;
+
     if (m_kinect)
 	m_kinect->deinitialize();
 

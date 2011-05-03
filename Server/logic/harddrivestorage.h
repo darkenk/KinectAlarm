@@ -5,65 +5,30 @@
 #include "ikinectobservable.h"
 #include "ikinect.h"
 #include "kinectpluginloader.h"
+#include "ikinectstorage.h"
 
 #include <QObject>
-#include <QString>
 
-class HardDriveStorage : public QObject, public IKinectObserver
+class HardDriveStorage : public QObject, public IKinectStorage
 {
     Q_OBJECT
 public:
-    HardDriveStorage(KinectPluginLoader* _kinect, QObject *_parent = 0);
+    HardDriveStorage(QObject *_parent = 0);
     virtual ~HardDriveStorage();
 
     void setDirectoryPath(const QString& _path) { m_directoryPath = _path; }
     QString directoryPath() { return m_directoryPath; }
 
-    void setFirstDelay(int _msec) { m_firstDelay = _msec; }
-    int firstDelay() { return m_firstDelay; }
+    QString name() { return "HardDriveStorage"; }
+    void saveImage(const QImage& _image);
 
-    void setRepeatableDelay(double _sec) { m_repeatableDelay = _sec; }
-    double repeatableDelay() { return m_repeatableDelay; }
-
-    void loadFromFile();
     void saveToFile();
-
-    void setStorageActive(bool _active) { m_storageActive = _active; if (m_kinect) {if (_active)  m_kinect->addKinectObserver(*this); else m_kinect->removeKinectObserver(*this);} }
-    bool storageActive() { return m_storageActive; }
-
+    void loadFromFile();
 
 signals:
 
-protected:
-    void moveDetected(quint8 *_data, int _width, int _height);
-    void timerEvent(QTimerEvent *_evt);
-
-public slots:
-    void onKinectChanged(IKinect* _kinect);
-
-private slots:
-    void saveFirstImage();
-    void saveNextImage();
-
 private:
-    void saveImage();
-    IKinect* m_kinect;
-    KinectPluginLoader* m_kinectPluginLoader;
     QString m_directoryPath;
-    int m_firstDelay;
-    double m_repeatableDelay;
-    bool m_storageActive;
-
-    bool m_nextImageLaunch;
-    bool m_firstImageLaunch;
-    bool m_firstImageTook;
-    bool m_moveDetected;
-
-    int m_nextImageTimerId;
-
-    quint8* m_imageData;
-    int m_imageWidth;
-    int m_imageHeight;
 
 };
 

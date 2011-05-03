@@ -120,17 +120,21 @@ bool OpenNIObject::initialize()
     xn::EnumerationErrors errors;
     XnStatus rc;
     rc = m_context->InitFromXmlFile(configXml.fileName().toAscii(), &errors);
+    qDebug() << Q_FUNC_INFO;
     if (!checkError(rc, errors))
 	return false;
     rc = m_context->FindExistingNode(XN_NODE_TYPE_DEPTH, *m_depthGenerator);
+    qDebug() << Q_FUNC_INFO;
     if (!checkError(rc, errors)) {
 	return false;
     }
     rc = m_context->FindExistingNode(XN_NODE_TYPE_IMAGE, *m_imageGenerator);
+    qDebug() << Q_FUNC_INFO;
     if (!checkError(rc, errors)) {
 	return false;
     }
     rc = m_context->FindExistingNode(XN_NODE_TYPE_SCENE, *m_sceneAnalyzer);
+    qDebug() << Q_FUNC_INFO;
     if (!checkError(rc, errors)) {
 	return false;
     }
@@ -253,7 +257,7 @@ void OpenNIObject::notifyAll(quint8 *_data, int _width, int _height)
     }
 }
 
-bool OpenNIObject::checkError(XnStatus _result, xn::EnumerationErrors _errors) {
+bool OpenNIObject::checkError(XnStatus& _result, xn::EnumerationErrors& _errors) {
     if (_result == XN_STATUS_NO_NODE_PRESENT) {
 	XnChar strError[1024];
 	_errors.ToString(strError,  1024);
