@@ -1,5 +1,7 @@
 #include "picasastorage.h"
 
+#include "kinectglobal.h"
+
 #include <QUrl>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -13,12 +15,6 @@
 #include <QDateTime>
 #include <QSettings>
 #include <QBuffer>
-
-#define INFO_LINE __FILE__ << "::" << __LINE__
-
-#define BEGIN qDebug() << "+++++" << INFO_LINE << Q_FUNC_INFO << " begin";
-#define INFO(x) qDebug() << INFO_LINE << Q_FUNC_INFO << x;
-#define END qDebug() <<   "=====" << INFO_LINE << Q_FUNC_INFO << " end";
 
 PicasaStorage::PicasaStorage(QObject *parent) :
     QObject(parent),
@@ -162,9 +158,8 @@ bool PicasaStorage::checkKinectFolderExistence(QString _xml)
 	    }
 	}
     }
-    return false;
-
     END;
+    return false;
 }
 
 void PicasaStorage::requestSendImage(const QByteArray& _data, const QString& _imgName)

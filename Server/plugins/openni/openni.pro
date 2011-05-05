@@ -2,6 +2,7 @@ TEMPLATE = lib
 CONFIG += plugin
 
 TARGET = openni_plugin
+DESTDIR = ../
 
 
 INCLUDEPATH += /usr/include/ni ../../interfaces ../../logic

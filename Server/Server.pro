@@ -38,7 +38,8 @@ HEADERS  += ui/mainwindow.h \
     logic/kinectpluginloader.h \
     logic/picasastorage.h \
     logic/storage.h \
-    interfaces/ikinectstorage.h
+    interfaces/ikinectstorage.h \
+    kinectglobal.h
 
 FORMS    += ui/mainwindow.ui \
     ui/settingsdialog.ui

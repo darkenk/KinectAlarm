@@ -4,6 +4,8 @@
 #include <ikinectobserver.h>
 #include <ikinect.h>
 
+#include <dataprocessor.h>
+
 #include <libfreenect.h>
 #include <QObject>
 #include <QMutex>
@@ -12,6 +14,7 @@
 class Kinect : public QThread, public IKinect
 {
     Q_OBJECT
+    Q_INTERFACES(IKinect)
 public:
     Kinect(QObject *parent = 0);
     ~Kinect();
@@ -48,11 +51,14 @@ protected:
     void run();
     void notifyAll(quint8 *_data, int _width, int _height);
 
+private slots:
+    void onZerosCount(int zeros);
+
 private:
     void videoCallback(freenect_device *dev, void *rgb, uint32_t timestamp);
     void depthCallback(freenect_device *dev, void *depth, uint32_t timestamp);
 
-    Q_DISABLE_COPY(Kinect)
+//   Q_DISABLE_COPY(Kinect)
 
     freenect_context* m_ctx;
     freenect_device* m_dev;
@@ -69,6 +75,8 @@ private:
     QList< IKinectObserver* > m_observersList;
 
     static Kinect* m_instance;
+
+    DataProcessor* m_dataProcessor;
 };
 
 #endif // KINECT_H

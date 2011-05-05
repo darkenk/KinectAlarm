@@ -1,6 +1,8 @@
 #include "kinect.h"
 #include <QDebug>
 
+#include "../../kinectglobal.h"
+
 Kinect* Kinect::m_instance = 0;
 
 //Kinect* Kinect::instance()
@@ -17,6 +19,8 @@ Kinect::Kinect(QObject *parent) :
     QThread(parent)
 {
     if (!m_instance) {
+	m_dataProcessor = new DataProcessor();
+	connect(m_dataProcessor, SIGNAL(nonZerosPixelsChanged(int)), SLOT(onZerosCount(int)));
 	m_die = false;
 	m_instance = this;
     }
@@ -24,7 +28,7 @@ Kinect::Kinect(QObject *parent) :
 
 Kinect::~Kinect()
 {
-
+    //TODO: check if the memeory is released there
 }
 
 
@@ -52,6 +56,9 @@ void Kinect::videoCallback(freenect_device *dev, void *rgb, uint32_t timestamp)
     m_backVideoBuffer = m_midVideoBuffer;
     freenect_set_video_buffer(dev, m_backVideoBuffer);
     m_midVideoBuffer = (uint8_t*)rgb;
+    m_dataProcessor->processImage(m_midVideoBuffer);
+
+
 }
 
 void Kinect::depthCallback(freenect_device *dev, void *depth, uint32_t timestamp)
@@ -127,7 +134,9 @@ bool Kinect::initialize()
     int devices = freenect_num_devices(m_ctx);
     qDebug() << "Number of devices " << devices;
 
-    Q_ASSERT(freenect_open_device(m_ctx, &m_dev, 0) >= 0);
+    if (freenect_open_device(m_ctx, &m_dev, 0) < 0) {
+	return false;
+    }
 
     m_backVideoBuffer = new uint8_t[640*480*3];
     m_midVideoBuffer = new uint8_t[640*480*3];
@@ -205,4 +214,12 @@ void Kinect::notifyAll(quint8 *_data, int _width, int _height)
     }
 }
 
+void Kinect::onZerosCount(int zeros)
+{
+    INFO(zeros);
+    if (zeros>40) {
+	notifyAll(rgbImage(), rgbImageWidth(), rgbImageHeight());
+    }
+}
 
+Q_EXPORT_PLUGIN2(freenect_plugin, Kinect)

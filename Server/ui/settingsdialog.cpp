@@ -22,7 +22,9 @@ SettingsDialog::SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStora
     ui->nextImageSpinBox->setValue(m_hardDriveStorage->repeatableDelay());
     ui->storageActive->setCheckState(m_hardDriveStorage->storageActive() ? Qt::Checked : Qt::Unchecked);
     QList<QString> plugins = m_kinectPluginLoader->pluginsList();
+
     ui->pluginComboBox->insertItems(0, plugins);
+    ui->pluginComboBox->setCurrentIndex(plugins.indexOf(m_kinectPluginLoader->plugin()->pluginName()));
     ui->picasaStorageActive->setCheckState(m_picasaStorage->storageActive() ? Qt::Checked : Qt::Unchecked);
     ui->picasaFirstImageSpinBox->setValue(m_picasaStorage->firstDelay());
     ui->picasaNextImageSpinBox->setValue(m_picasaStorage->repeatableDelay());
