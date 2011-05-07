@@ -198,7 +198,7 @@ void PicasaStorage::requestCreatingKinectAlarmAlbum()
 	"xmlns:media='http://search.yahoo.com/mrss/' " \
 	"xmlns:gphoto='http://schemas.google.com/photos/2007'>\n" \
     "  <title type='text'>KinectAlarm</title>\n" \
-    "  <summary type='text'>This was the recent trip I took to Italy.</summary>\n" \
+    "  <summary type='text'></summary>\n" \
 
     "  <gphoto:access>private</gphoto:access>\n" \
     "  <gphoto:timestamp>");
@@ -206,7 +206,7 @@ void PicasaStorage::requestCreatingKinectAlarmAlbum()
     xmlQuery.append( \
     "</gphoto:timestamp>\n" \
     "  <media:group>\n" \
-    "    <media:keywords>italy, vacation</media:keywords>\n" \
+    "    <media:keywords>kinect, alarm</media:keywords>\n" \
     "  </media:group>\n" \
     "  <category scheme='http://schemas.google.com/g/2005#kind' " \
 	"term='http://schemas.google.com/photos/2007#album'>" \

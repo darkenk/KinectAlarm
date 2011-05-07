@@ -12,4 +12,12 @@ SOURCES += openniobject.cpp
 
 HEADERS += openniobject.h
 
+include(../../../../common.pri)
+
+DESTDIR = $$DESTDIR/plugins
+
+target.path = $$PREFIX/share/plugins
+
+INSTALLS += target
+
 

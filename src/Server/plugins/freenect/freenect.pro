@@ -4,7 +4,7 @@ CONFIG += plugin link_pkgconfig
 PKGCONFIG += libfreenect opencv
 
 TARGET = freenect_plugin
-DESTDIR = ../
+#DESTDIR = ../
 
 
 INCLUDEPATH += ../../interfaces ../../logic
@@ -15,3 +15,10 @@ SOURCES +=  kinect.cpp \
 HEADERS +=  kinect.h \
 	    dataprocessor.h
 
+include(../../../../common.pri)
+
+DESTDIR = $$DESTDIR/plugins
+
+target.path = $$PREFIX/share/plugins
+
+INSTALLS += target
