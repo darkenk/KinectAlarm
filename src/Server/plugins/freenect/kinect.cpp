@@ -129,6 +129,7 @@ void Kinect::run()
 
 bool Kinect::initialize()
 {
+    BEGIN;
     Q_ASSERT(freenect_init(&m_ctx, NULL) >= 0);
     freenect_set_log_level(m_ctx, FREENECT_LOG_DEBUG);
     int devices = freenect_num_devices(m_ctx);
@@ -143,6 +144,7 @@ bool Kinect::initialize()
     m_frontVideoBuffer = new uint8_t[640*480*3];
 
     m_midDepth = new uint8_t[640*480*3];
+    END;
     return true;
 }
 

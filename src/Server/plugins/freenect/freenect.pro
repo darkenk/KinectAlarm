@@ -19,6 +19,6 @@ include(../../../../common.pri)
 
 DESTDIR = $$DESTDIR/plugins
 
-target.path = $$PREFIX/share/plugins
+target.path = $$PREFIX/share/kinectalarm/plugins
 
 INSTALLS += target
