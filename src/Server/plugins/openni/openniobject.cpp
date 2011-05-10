@@ -262,6 +262,11 @@ void OpenNIObject::deinitialize()
     m_initialized = false;
 }
 
+bool OpenNIObject::isRunning()
+{
+    return QThread::isRunning();
+}
+
 void OpenNIObject::addKinectObserver(IKinectObserver &_observer)
 {
     m_observersList.append(&_observer);

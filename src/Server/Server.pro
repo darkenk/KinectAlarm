@@ -46,8 +46,8 @@ RESOURCES += \
 
 OTHER_FILES += \
     config.xml \
-    home1.png \
-    home_addblocked.png
+    home_disabled.png \
+    home_enabled.png
 
 include(../../common.pri)
 

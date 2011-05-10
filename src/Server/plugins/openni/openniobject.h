@@ -31,6 +31,7 @@ public:
 
     bool startGenerating();
     void pauseGenerating();
+    bool isRunning();
     bool initialize();
     void deinitialize();
 

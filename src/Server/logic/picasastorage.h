@@ -32,6 +32,7 @@ public:
 
 
 signals:
+    void statusMessage(QString type, QString _msg);
 
 protected:
 

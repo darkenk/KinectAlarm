@@ -240,4 +240,9 @@ void Kinect::onZerosCount(int zeros)
     }
 }
 
+bool Kinect::isRunning()
+{
+    return QThread::isRunning();
+}
+
 Q_EXPORT_PLUGIN2(freenect_plugin, Kinect)

@@ -33,6 +33,8 @@ private slots:
     void onSettingsAction();
     void onStartAction();
     void onKinectPluginChange(IKinect* _kinect);
+    void onMessageSignal(QString _type, QString _msg);
+    void onKinectPluginRunningChange(bool _running);
 
 private:
     void loadSettings();

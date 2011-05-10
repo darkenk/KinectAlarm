@@ -47,6 +47,8 @@ void PicasaStorage::onReplyFinished(QNetworkReply *_reply)
 	    qDebug() << a << _reply->rawHeader(a);
 	}
 	qDebug() << "AllContent\n" << content << "\nContentFinished";
+    } else {
+	emit statusMessage("Error", "Problem with reply");
     }
     if ((m_authRequest) && (_reply->request().url() == m_authRequest->url())) {
 	qDebug() << "Auth request" << _reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
@@ -59,7 +61,12 @@ void PicasaStorage::onReplyFinished(QNetworkReply *_reply)
 	    qDebug() << m_authHeader;
 	    requestAlbums();
 	} else {
-	    //TODO: emit signal if something was wrong
+	    //TODO: improve this status chceck. add more sophisticated communicates
+	    if (_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 202) {
+		emit statusMessage("Error", "Authorization failed. Please check login and password are correct");
+	    } else {
+		emit statusMessage("Error", "Authorization failed.");
+	    }
 	}
 	delete m_authRequest;
 	m_authRequest = 0;

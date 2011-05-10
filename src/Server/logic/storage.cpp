@@ -28,7 +28,7 @@ Storage::Storage(KinectPluginLoader* _pluginLoader, IKinectStorage* _storageImpl
 
 void Storage::moveDetected(quint8 *_data, int _width, int _height)
 {
-    qDebug() << Q_FUNC_INFO;
+//    qDebug() << Q_FUNC_INFO;
     Q_UNUSED(_data)
     if (!m_storageActive)
 	return;

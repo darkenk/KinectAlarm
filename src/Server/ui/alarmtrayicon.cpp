@@ -27,12 +27,13 @@ AlarmTrayIcon::AlarmTrayIcon(QObject *_parent) :
 {
     HardDriveStorage* hds = new HardDriveStorage(this);
     PicasaStorage* ps = new PicasaStorage(this);
+    connect(ps, SIGNAL(statusMessage(QString, QString)), SLOT(onMessageSignal(QString, QString)));
     m_hardDriveStorage = new Storage(m_kinectPluginLoader, hds,this);
     m_picasaStorage = new Storage(m_kinectPluginLoader, ps, this);
     connect(m_kinectPluginLoader, SIGNAL(newKinectEngine(IKinect*)), this, SLOT(onKinectPluginChange(IKinect*)));
     onKinectPluginChange(m_kinectPluginLoader->plugin());
 
-    setIcon(QIcon(":/KinectServer/home1.png"));
+    onKinectPluginRunningChange(m_kinect->isRunning());
 #ifdef KinectAlarmDebug
     connect(m_debugAction, SIGNAL(triggered()), this, SLOT(onDebugAction()));
     m_contextMenu->addAction(m_debugAction);
@@ -103,6 +104,7 @@ void AlarmTrayIcon::onStartAction()
     }
     m_settingsAction->setEnabled(m_kinectStarted);
     m_kinectStarted = !m_kinectStarted;
+    onKinectPluginRunningChange(m_kinectStarted);
 }
 
 void AlarmTrayIcon::onKinectPluginChange(IKinect* _kinect)
@@ -113,5 +115,24 @@ void AlarmTrayIcon::onKinectPluginChange(IKinect* _kinect)
     m_startAction->setEnabled(_kinect);
     m_kinect = _kinect;
     END;
+}
+
+void AlarmTrayIcon::onMessageSignal(QString _type, QString _msg)
+{
+    QSystemTrayIcon::MessageIcon icon(QSystemTrayIcon::Information);
+    if (_type == "Error") {
+	icon = QSystemTrayIcon::Warning;
+    }
+    showMessage(qAppName(), _msg, icon);
+}
+
+void AlarmTrayIcon::onKinectPluginRunningChange(bool _running)
+{
+    if (_running) {
+	setIcon(QIcon(":/KinectServer/home_enabled.png"));
+    } else {
+	setIcon(QIcon(":/KinectServer/home_disabled.png"));
+    }
+
 }
 

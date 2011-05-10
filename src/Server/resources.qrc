@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/KinectServer">
         <file>config.xml</file>
-        <file>home1.png</file>
-        <file>home_addblocked.png</file>
+        <file>home_enabled.png</file>
+        <file>home_disabled.png</file>
     </qresource>
 </RCC>
