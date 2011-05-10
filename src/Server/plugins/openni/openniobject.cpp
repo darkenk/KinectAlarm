@@ -8,20 +8,12 @@
 #include <QSettings>
 #include <QDebug>
 
+#include "../../kinectglobal.h"
+
 //OpenNIObject* OpenNIObject::m_instance = NULL;
 
 OpenNIObject::OpenNIObject(QObject *parent) :
     QThread(parent),
-    m_xnStatus(XN_STATUS_OK),
-    m_context(new xn::Context()),
-    m_depthGenerator(new xn::DepthGenerator()),
-    m_imageGenerator(new xn::ImageGenerator()),
-    m_sceneAnalyzer(new xn::SceneAnalyzer()),
-    m_depthImage(NULL),
-    m_rgbImage(NULL),
-    m_imageMetaData(new xn::ImageMetaData()),
-    m_depthMetaData(new xn::DepthMetaData()),
-    m_sceneMetaData(new xn::SceneMetaData()),
     m_moveDetected(false),
     m_nextShot(true),
     m_timer(new QTimer),
@@ -37,22 +29,6 @@ OpenNIObject::OpenNIObject(QObject *parent) :
 OpenNIObject::~OpenNIObject()
 {
     deinitialize();
-
-    if (m_rgbImage) {
-	delete[] m_rgbImage;
-	m_rgbImage = NULL;
-    }
-    if (m_depthImage) {
-	delete[] m_depthImage;
-	m_depthImage = NULL;
-    }
-
-    delete m_depthGenerator;
-    delete m_imageGenerator;
-    delete m_sceneAnalyzer;
-    delete m_imageMetaData;
-    delete m_depthMetaData;
-    delete m_sceneMetaData;
 }
 
 //OpenNIObject * OpenNIObject::instance()
@@ -87,6 +63,7 @@ bool OpenNIObject::startGenerating()
 
 void OpenNIObject::pauseGenerating()
 {
+    m_context->StopGeneratingAll();
     m_imageGenerator->StopGenerating();
     m_timer->stop();
     quit();
@@ -97,6 +74,18 @@ bool OpenNIObject::initialize()
     qDebug() << Q_FUNC_INFO;
     if (m_initialized)
 	return true;
+
+    m_xnStatus = XN_STATUS_OK;
+    m_context = new xn::Context();
+    m_depthGenerator = new xn::DepthGenerator();
+    m_imageGenerator = new xn::ImageGenerator();
+    m_sceneAnalyzer = new xn::SceneAnalyzer();
+    m_depthImage = NULL;
+    m_rgbImage = NULL;
+    m_sceneImage = NULL;
+    m_imageMetaData = new xn::ImageMetaData();
+    m_depthMetaData = new xn::DepthMetaData();
+    m_sceneMetaData = new xn::SceneMetaData();
 
 #ifdef Q_WS_X11
     QFile configXml;
@@ -121,18 +110,21 @@ bool OpenNIObject::initialize()
     XnStatus rc;
     rc = m_context->InitFromXmlFile(configXml.fileName().toAscii(), &errors);
     qDebug() << Q_FUNC_INFO;
-    if (!checkError(rc, errors))
+    if (!checkError(rc, errors)) {
 	return false;
+    }
+    INFO("here");
     rc = m_context->FindExistingNode(XN_NODE_TYPE_DEPTH, *m_depthGenerator);
-    qDebug() << Q_FUNC_INFO;
+    INFO("here1");
     if (!checkError(rc, errors)) {
 	return false;
     }
+    INFO("here2");
     rc = m_context->FindExistingNode(XN_NODE_TYPE_IMAGE, *m_imageGenerator);
-    qDebug() << Q_FUNC_INFO;
     if (!checkError(rc, errors)) {
 	return false;
     }
+    INFO("here3");
     rc = m_context->FindExistingNode(XN_NODE_TYPE_SCENE, *m_sceneAnalyzer);
     qDebug() << Q_FUNC_INFO;
     if (!checkError(rc, errors)) {
@@ -236,8 +228,38 @@ QString OpenNIObject::pluginName()
 void OpenNIObject::deinitialize()
 {
     pauseGenerating();
-    m_context->Shutdown();
-    delete m_context;
+    if (m_context) {
+	m_context->Shutdown();
+	delete m_context;
+	m_context = NULL;
+    }
+
+    delete m_depthGenerator;
+    m_depthGenerator = NULL;
+    delete m_imageGenerator;
+    m_imageGenerator = NULL;
+    delete m_sceneAnalyzer;
+    m_sceneAnalyzer = NULL;
+    if (m_rgbImage) {
+	delete[] m_rgbImage;
+	m_rgbImage = NULL;
+    }
+    if (m_depthImage) {
+	delete[] m_depthImage;
+	m_depthImage = NULL;
+    }
+    if (m_sceneImage) {
+	delete[] m_sceneImage;
+	m_sceneImage = NULL;
+    }
+
+    delete m_imageMetaData;
+    m_imageMetaData = NULL;
+    delete m_depthMetaData;
+    m_depthMetaData = NULL;
+    delete m_sceneMetaData;
+    m_sceneMetaData = NULL;
+    m_initialized = false;
 }
 
 void OpenNIObject::addKinectObserver(IKinectObserver &_observer)
@@ -264,7 +286,9 @@ bool OpenNIObject::checkError(XnStatus& _result, xn::EnumerationErrors& _errors)
 	qDebug() << Q_FUNC_INFO << strError;
 	return false;
     } else  if (_result != XN_STATUS_OK) {
-	qDebug() << Q_FUNC_INFO << "Something is wrong";
+	XnChar strError[1024];
+	_errors.ToString(strError,  1024);
+	INFO(strError);
 	return false;
     }
     return true;

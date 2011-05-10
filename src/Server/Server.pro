@@ -6,7 +6,7 @@
 
 QT       += core gui opengl network xml
 
-TARGET = Server
+TARGET = kinectalarm
 TEMPLATE = app
 
 INCLUDEPATH += /usr/include/ni ./logic ./ui ./interfaces

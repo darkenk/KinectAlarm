@@ -11,6 +11,10 @@ public:
     KinectImageWidget(IKinect* _kinect, QWidget *_parent = 0);
     virtual ~KinectImageWidget();
 
+    void setKinect(IKinect* _kinect) {
+	m_kinect = _kinect;
+    }
+
 signals:
 
 protected:

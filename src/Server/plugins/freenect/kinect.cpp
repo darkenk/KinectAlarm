@@ -130,6 +130,12 @@ void Kinect::run()
 bool Kinect::initialize()
 {
     BEGIN;
+    m_ctx = 0;
+    m_dev = 0;
+    m_backVideoBuffer = 0;
+    m_midVideoBuffer = 0;
+    m_frontVideoBuffer = 0;
+    m_midDepth = 0;
     Q_ASSERT(freenect_init(&m_ctx, NULL) >= 0);
     freenect_set_log_level(m_ctx, FREENECT_LOG_DEBUG);
     int devices = freenect_num_devices(m_ctx);
@@ -151,13 +157,23 @@ bool Kinect::initialize()
 void Kinect::deinitialize()
 {
     pauseGenerating();
-    freenect_close_device(m_dev);
-    freenect_shutdown(m_ctx);
+    if (m_dev) {
+	freenect_close_device(m_dev);
+	m_dev = 0;
+    }
+    if (m_ctx) {
+	freenect_shutdown(m_ctx);
+	m_ctx = 0;
+    }
 
     delete m_backVideoBuffer;
+    m_backVideoBuffer = 0;
     delete m_midVideoBuffer;
+    m_midVideoBuffer = 0;
     delete m_frontVideoBuffer;
+    m_frontVideoBuffer = 0;
     delete m_midDepth;
+    m_midDepth = 0;
 }
 
 quint32 Kinect::rgbImageWidth()

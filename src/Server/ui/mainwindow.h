@@ -18,9 +18,11 @@ public:
     explicit MainWindow(IKinect* _kinect, QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void onKinectPluginChange(IKinect* _kinect);
+
 private:
     Ui::MainWindow *ui;
-    IKinect* m_kinect;
     KinectImageWidget* m_kinectWidget;
 };
 

@@ -10,6 +10,8 @@
 #include <QSettings>
 #include <QDebug>
 
+#include "../kinectglobal.h"
+
 AlarmTrayIcon::AlarmTrayIcon(QObject *_parent) :
     QSystemTrayIcon(_parent),
     //m_kinect(OpenNIObject::instance()),
@@ -63,9 +65,12 @@ void AlarmTrayIcon::onDebugAction()
     qDebug() << Q_FUNC_INFO;
     if (!m_kinect) {
 	QMessageBox::warning(NULL, tr("Kinect not set"), tr("Please choose plugin first"));
+	return;
     }
     if (!m_debugWindow) {
-	m_debugWindow = new MainWindow(m_kinect);
+	MainWindow* p = new MainWindow(m_kinect);
+	m_debugWindow = p;
+	connect(m_kinectPluginLoader, SIGNAL(newKinectEngine(IKinect*)), p, SLOT(onKinectPluginChange(IKinect*)));
 	m_debugWindow->show();
     } else {
 	m_debugWindow->show();
@@ -96,14 +101,17 @@ void AlarmTrayIcon::onStartAction()
 	m_startAction->setText(tr("S&top"));
 	m_kinect->startGenerating();
     }
+    m_settingsAction->setEnabled(m_kinectStarted);
     m_kinectStarted = !m_kinectStarted;
 }
 
 void AlarmTrayIcon::onKinectPluginChange(IKinect* _kinect)
 {
-    if (!_kinect) {
-	m_startAction->setDisabled(true);
-    }
+    BEGIN;
+    INFO(_kinect);
+    m_debugAction->setEnabled(_kinect);
+    m_startAction->setEnabled(_kinect);
     m_kinect = _kinect;
+    END;
 }
 

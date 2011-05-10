@@ -88,7 +88,10 @@ IKinect* KinectPluginLoader::setPlugin(QString _pluginName)
 
     m_kinect = newKinect;
     emit newKinectEngine(m_kinect);
-    m_kinect->initialize();
+    if (!m_kinect->initialize()) {
+	emit newKinectEngine(NULL);
+
+    }
     return m_kinect;
 }
 

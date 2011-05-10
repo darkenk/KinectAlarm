@@ -5,8 +5,7 @@
 MainWindow::MainWindow(IKinect* _kinect, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_kinect(_kinect),
-    m_kinectWidget(new KinectImageWidget(m_kinect))
+    m_kinectWidget(new KinectImageWidget(_kinect))
 
 {
     ui->setupUi(this);
@@ -17,4 +16,9 @@ MainWindow::MainWindow(IKinect* _kinect, QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::onKinectPluginChange(IKinect *_kinect)
+{
+    m_kinectWidget->setKinect(_kinect);
 }
