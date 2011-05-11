@@ -2,14 +2,14 @@ Source: kinectalarm
 Section: unknown
 Priority: extra
 Maintainer: Dariusz Kluska <163776@student.pwr.wroc.pl>
-Build-Depends: debhelper (>= 7.0.50~)
+Build-Depends: debhelper (>= 7.0.50~), libqt4-dev, libcv-dev, libfreenect-dev
 Standards-Version: 3.9.1
-Homepage: <insert the upstream URL, if relevant>
+#Homepage: <insert the upstream URL, if relevant>
 #Vcs-Git: git://git.debian.org/collab-maint/kinectalarm.git
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/kinectalarm.git;a=summary
 
 Package: kinectalarm
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: KinectAlarm
+ Application made for pass university project

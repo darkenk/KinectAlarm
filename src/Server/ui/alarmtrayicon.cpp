@@ -47,6 +47,15 @@ AlarmTrayIcon::AlarmTrayIcon(QObject *_parent) :
 
     setContextMenu(m_contextMenu);
     setToolTip(tr("Kinect Alarm Fuck Yea"));
+
+    QSettings settings;
+    settings.beginGroup("Global");
+    QVariant var = settings.value("start_after_launch", QVariant(false));
+    INFO(var.toBool());
+    if (var.toBool()) {
+	m_startAction->trigger();
+    }
+    settings.endGroup();
 }
 
 AlarmTrayIcon::~AlarmTrayIcon()

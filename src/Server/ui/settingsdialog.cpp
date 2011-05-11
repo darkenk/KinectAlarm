@@ -36,6 +36,11 @@ SettingsDialog::SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStora
     ui->picasaLogin->setText(ps->login());
     ui->picasaPassword->setText(ps->password());
 
+    QSettings settings;
+    settings.beginGroup("Global");
+    QVariant var = settings.value("start_after_launch", QVariant(false));
+    ui->launchKinectAfterStart->setChecked(var.toBool());
+    settings.endGroup();
 
 }
 
@@ -95,6 +100,11 @@ void SettingsDialog::on_buttonBox_accepted()
     ps->saveToFile();
     if (ps->password().length() != 0)
 	ps->requestAuth();
+    QSettings settings;
+    settings.beginGroup("Global");
+    QVariant var(ui->launchKinectAfterStart->isChecked());
+    settings.setValue("start_after_launch", var); //read data is done in alarmtrayicons' ctor
+    settings.endGroup();
     close();
 }
 

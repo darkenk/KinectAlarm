@@ -29,6 +29,7 @@ PicasaStorage::PicasaStorage(QObject *parent) :
     connect(m_accessManager, SIGNAL(finished(QNetworkReply*)), SLOT(onReplyFinished(QNetworkReply*)));
     connect(m_accessManager, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)), SLOT(onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)));
     m_accessManager->setNetworkAccessible(QNetworkAccessManager::Accessible);
+    requestAlbums();
     END
 }
 
@@ -48,7 +49,7 @@ void PicasaStorage::onReplyFinished(QNetworkReply *_reply)
 	}
 	qDebug() << "AllContent\n" << content << "\nContentFinished";
     } else {
-	emit statusMessage("Error", "Problem with reply");
+
     }
     if ((m_authRequest) && (_reply->request().url() == m_authRequest->url())) {
 	qDebug() << "Auth request" << _reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
@@ -81,7 +82,7 @@ void PicasaStorage::onReplyFinished(QNetworkReply *_reply)
 		saveToFile();
 	    }
 	} else {
-	    //TODO: emit signal if something was wrong
+	    emit statusMessage("Error", "Requesting album list failed");
 	}
 	delete m_albumRequest;
 	m_albumRequest = 0;
@@ -90,7 +91,10 @@ void PicasaStorage::onReplyFinished(QNetworkReply *_reply)
 	INFO(_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt());
 	//TODO: should i check if something goes wrong? probably yes, but i'm too lazy
 	if (_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 404 ) {
-	    requestCreatingKinectAlarmAlbum();
+	    requestAlbums();
+	}
+	if (_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 500) {
+	    emit statusMessage("Error", "Picasa Internal Server Error");
 	}
 	delete m_sendImageRequest;
 	m_sendImageRequest = 0;
@@ -231,7 +235,7 @@ void PicasaStorage::saveToFile()
     settings.setValue("login", QVariant(m_login));
     //settings.setValue("password", QVariant(m_password));
     settings.setValue("auth_header", QVariant(m_authHeader));
-    settings.setValue("kinect_album", QVariant(m_kinectAlbumAddress));
+//    settings.setValue("kinect_album", QVariant(m_kinectAlbumAddress));
     settings.endGroup();
 }
 
@@ -246,8 +250,8 @@ void PicasaStorage::loadFromFile()
     //setPassword(var.toString());
     var = settings.value("auth_header", QVariant(m_authHeader));
     m_authHeader = var.toString();
-    var = settings.value("kinect_album", QVariant(m_kinectAlbumAddress));
-    m_kinectAlbumAddress = var.toString();
+//    var = settings.value("kinect_album", QVariant(m_kinectAlbumAddress));
+//    m_kinectAlbumAddress = var.toString();
     settings.endGroup();
 }
 
