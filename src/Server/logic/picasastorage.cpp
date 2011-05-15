@@ -29,7 +29,13 @@ PicasaStorage::PicasaStorage(QObject *parent) :
     connect(m_accessManager, SIGNAL(finished(QNetworkReply*)), SLOT(onReplyFinished(QNetworkReply*)));
     connect(m_accessManager, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)), SLOT(onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)));
     m_accessManager->setNetworkAccessible(QNetworkAccessManager::Accessible);
-    requestAlbums();
+    QSettings settings;
+    settings.beginGroup(name());
+    QVariant var = settings.value("storage_active", QVariant());
+    if (var.toBool()) {
+	requestAlbums();
+    }
+    settings.endGroup();
     END
 }
 
@@ -90,12 +96,18 @@ void PicasaStorage::onReplyFinished(QNetworkReply *_reply)
 	qDebug() << "SendRequest";
 	INFO(_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt());
 	//TODO: should i check if something goes wrong? probably yes, but i'm too lazy
-	if (_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 404 ) {
+	switch (_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt()) {
+	case 0:
+	case 404:
 	    requestAlbums();
-	}
-	if (_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 500) {
+	    break;
+	case 500:
 	    emit statusMessage("Error", "Picasa Internal Server Error");
+	    break;
+	default:
+	    break;
 	}
+
 	delete m_sendImageRequest;
 	m_sendImageRequest = 0;
 	if (!m_pendingData.isEmpty()) {
@@ -189,6 +201,8 @@ void PicasaStorage::requestSendImage(const QByteArray& _data, const QString& _im
     m_sendImageRequest->setRawHeader(QByteArray("GData-Version"), QByteArray("2"));
     m_sendImageRequest->setRawHeader(QByteArray("Authorization"), QByteArray(m_authHeader.toAscii()));
     m_sendImageRequest->setRawHeader(QByteArray("Slug"), QByteArray(_imgName.toAscii()));
+    INFO(m_kinectAlbumAddress);
+    INFO(m_authHeader);
     m_accessManager->post(*m_sendImageRequest, _data);
     END
 

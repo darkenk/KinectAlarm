@@ -55,7 +55,13 @@ DESTDIR = $$DESTDIR/bin
 
 target.path = $$PREFIX/bin
 
-INSTALLS += target
+INSTALLS += target icons desktop
+
+icons.files = home_enabled.png
+icons.path = $$PREFIX/share/kinectalarm
+
+desktop.files = KinectAlarm.desktop
+desktop.path = $$PREFIX/share/applications
 
 message($$DESTDIR)
 CONFIG(release, debug|release):message(Release build!) #will print

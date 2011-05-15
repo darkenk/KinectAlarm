@@ -7,6 +7,8 @@
 #include <QMessageBox>
 #include <QSettings>
 
+#include "../kinectglobal.h"
+
 SettingsDialog::SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStorage, KinectPluginLoader* _kinectPluginLoader, QWidget *_parent) :
     QDialog(_parent),
     ui(new Ui::SettingsDialog),
@@ -15,6 +17,7 @@ SettingsDialog::SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStora
     m_picasaStorage(_picasaStorage),
     m_kinectPluginLoader(_kinectPluginLoader)
 {
+    BEGIN;
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
     ui->path->setText(dynamic_cast<HardDriveStorage*>(m_hardDriveStorage->storageImpl())->directoryPath());
@@ -23,12 +26,18 @@ SettingsDialog::SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStora
     ui->storageActive->setCheckState(m_hardDriveStorage->storageActive() ? Qt::Checked : Qt::Unchecked);
     QList<QString> plugins = m_kinectPluginLoader->pluginsList();
 
+
     ui->pluginComboBox->insertItems(0, plugins);
     if (plugins.length()) {
-	ui->pluginComboBox->setCurrentIndex(plugins.indexOf(m_kinectPluginLoader->plugin()->pluginName()));
+	if (m_kinectPluginLoader->plugin()) {
+	    ui->pluginComboBox->setCurrentIndex(plugins.indexOf(m_kinectPluginLoader->plugin()->pluginName()));
+	} else {
+	    ui->pluginComboBox->setCurrentIndex(0);
+	}
     } else {
 	ui->pluginComboBox->setDisabled(true);
     }
+
     ui->picasaStorageActive->setCheckState(m_picasaStorage->storageActive() ? Qt::Checked : Qt::Unchecked);
     ui->picasaFirstImageSpinBox->setValue(m_picasaStorage->firstDelay());
     ui->picasaNextImageSpinBox->setValue(m_picasaStorage->repeatableDelay());
@@ -41,6 +50,7 @@ SettingsDialog::SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStora
     QVariant var = settings.value("start_after_launch", QVariant(false));
     ui->launchKinectAfterStart->setChecked(var.toBool());
     settings.endGroup();
+    END;
 
 }
 
@@ -51,6 +61,7 @@ SettingsDialog::~SettingsDialog()
 
 void SettingsDialog::on_storageActive_toggled(bool checked)
 {
+    BEGIN;
     ui->firstImageSpinBox->setEnabled(checked);
     ui->label->setEnabled(checked);
     ui->label_2->setEnabled(checked);
@@ -60,19 +71,23 @@ void SettingsDialog::on_storageActive_toggled(bool checked)
     ui->nextImageSpinBox->setEnabled(checked);
     ui->path->setEnabled(checked);
     ui->pathChooser->setEnabled(checked);
+    END;
 }
 
 void SettingsDialog::on_pathChooser_clicked()
 {
+    BEGIN;
     QString dir = QFileDialog::getExistingDirectory(this, tr("Choose directory"), ui->path->text());
-    qDebug() << Q_FUNC_INFO << dir;
+    INFO(dir);
     if (!dir.isEmpty()) {
 	ui->path->setText(dir);
     }
+    END;
 }
 
 void SettingsDialog::on_buttonBox_accepted()
 {
+    BEGIN;
     m_kinect = m_kinectPluginLoader->setPlugin(ui->pluginComboBox->currentText());
     m_kinectPluginLoader->saveSettings();
     m_hardDriveStorage->setStorageActive((bool)ui->storageActive->checkState());
@@ -106,15 +121,19 @@ void SettingsDialog::on_buttonBox_accepted()
     settings.setValue("start_after_launch", var); //read data is done in alarmtrayicons' ctor
     settings.endGroup();
     close();
+    END;
 }
 
 void SettingsDialog::on_buttonBox_rejected()
 {
+    BEGIN;
     close();
+    END;
 }
 
 void SettingsDialog::on_picasaStorageActive_toggled(bool checked)
 {
+    BEGIN;
     ui->label_7->setEnabled(checked);
     ui->label_8->setEnabled(checked);
     ui->label_9->setEnabled(checked);
@@ -125,4 +144,5 @@ void SettingsDialog::on_picasaStorageActive_toggled(bool checked)
     ui->picasaNextImageSpinBox->setEnabled(checked);
     ui->picasaLogin->setEnabled(checked);
     ui->picasaPassword->setEnabled(checked);
+    END;
 }

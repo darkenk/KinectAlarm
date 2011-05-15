@@ -1,9 +1,6 @@
 #include "alarmtrayicon.h"
 #include "settingsdialog.h"
-
-#ifdef KinectAlarmDebug
 #include "mainwindow.h"
-#endif
 
 #include <QMessageBox>
 #include <QApplication>
@@ -17,9 +14,7 @@ AlarmTrayIcon::AlarmTrayIcon(QObject *_parent) :
     //m_kinect(OpenNIObject::instance()),
     m_contextMenu(new QMenu),
     m_quitAction(new QAction(tr("&Quit"), this)),
-#ifdef KinectAlarmDebug
-    m_debugAction(new QAction(tr("&Debug"), this)),
-#endif
+    m_previewAction(new QAction(tr("&Preview"), this)),
     m_settingsAction(new QAction(tr("&Settings"), this)),
     m_startAction(new QAction(tr("S&tart"), this)),
     m_kinectStarted(false),
@@ -33,11 +28,12 @@ AlarmTrayIcon::AlarmTrayIcon(QObject *_parent) :
     connect(m_kinectPluginLoader, SIGNAL(newKinectEngine(IKinect*)), this, SLOT(onKinectPluginChange(IKinect*)));
     onKinectPluginChange(m_kinectPluginLoader->plugin());
 
-    onKinectPluginRunningChange(m_kinect->isRunning());
-#ifdef KinectAlarmDebug
-    connect(m_debugAction, SIGNAL(triggered()), this, SLOT(onDebugAction()));
-    m_contextMenu->addAction(m_debugAction);
-#endif
+    if (m_kinect)
+	onKinectPluginRunningChange(m_kinect->isRunning());
+    else
+	onKinectPluginRunningChange(false);
+    connect(m_previewAction, SIGNAL(triggered()), this, SLOT(onDebugAction()));
+    m_contextMenu->addAction(m_previewAction);
     connect(m_quitAction, SIGNAL(triggered()), this, SLOT(onQuitAction()));
     connect(m_settingsAction, SIGNAL(triggered()), this, SLOT(onSettingsAction()));
     connect(m_startAction, SIGNAL(triggered()), this, SLOT(onStartAction()));
@@ -69,7 +65,6 @@ void AlarmTrayIcon::onQuitAction()
     QApplication::quit();
 }
 
-#ifdef KinectAlarmDebug
 void AlarmTrayIcon::onDebugAction()
 {
     qDebug() << Q_FUNC_INFO;
@@ -77,17 +72,16 @@ void AlarmTrayIcon::onDebugAction()
 	QMessageBox::warning(NULL, tr("Kinect not set"), tr("Please choose plugin first"));
 	return;
     }
-    if (!m_debugWindow) {
+    if (!m_previewWindow) {
 	MainWindow* p = new MainWindow(m_kinect);
-	m_debugWindow = p;
+	m_previewWindow = p;
 	connect(m_kinectPluginLoader, SIGNAL(newKinectEngine(IKinect*)), p, SLOT(onKinectPluginChange(IKinect*)));
-	m_debugWindow->show();
+	m_previewWindow->show();
     } else {
-	m_debugWindow->show();
-	m_debugWindow->activateWindow();
+	m_previewWindow->show();
+	m_previewWindow->activateWindow();
     }
 }
-#endif
 
 void AlarmTrayIcon::onSettingsAction()
 {
@@ -120,7 +114,7 @@ void AlarmTrayIcon::onKinectPluginChange(IKinect* _kinect)
 {
     BEGIN;
     INFO(_kinect);
-    m_debugAction->setEnabled(_kinect);
+    m_previewAction->setEnabled(_kinect);
     m_startAction->setEnabled(_kinect);
     m_kinect = _kinect;
     END;
