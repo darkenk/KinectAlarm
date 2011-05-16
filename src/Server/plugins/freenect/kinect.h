@@ -78,6 +78,8 @@ private:
     static Kinect* m_instance;
 
     DataProcessor* m_dataProcessor;
+
+    bool m_initialized;
 };
 
 #endif // KINECT_H
