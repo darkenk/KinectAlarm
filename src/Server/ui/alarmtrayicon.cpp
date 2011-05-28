@@ -87,7 +87,6 @@ void AlarmTrayIcon::onDebugAction()
 
 void AlarmTrayIcon::onSettingsAction()
 {
-    qDebug() << Q_FUNC_INFO;
     if (!m_settingsWindow) {
 	m_settingsWindow = new SettingsDialog(m_hardDriveStorage, m_picasaStorage, m_scriptRunner, m_kinectPluginLoader);
 	m_settingsWindow->show();
