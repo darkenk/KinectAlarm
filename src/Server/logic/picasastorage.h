@@ -30,11 +30,8 @@ public:
     QString name() { return "PicasaStorage"; }
     void saveImage(const QImage &_image);
 
-
 signals:
     void statusMessage(QString type, QString _msg);
-
-protected:
 
 public slots:
     void requestAuth();

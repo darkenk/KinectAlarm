@@ -6,20 +6,28 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QSettings>
+#include <QProcess>
 
 #include "../kinectglobal.h"
 
-SettingsDialog::SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStorage, KinectPluginLoader* _kinectPluginLoader, QWidget *_parent) :
+SettingsDialog::SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStorage, Storage* _scriptRunner, KinectPluginLoader* _kinectPluginLoader, QWidget *_parent) :
     QDialog(_parent),
     ui(new Ui::SettingsDialog),
     m_kinect(_kinectPluginLoader->plugin()),
     m_hardDriveStorage(_hardDriveStorage),
     m_picasaStorage(_picasaStorage),
-    m_kinectPluginLoader(_kinectPluginLoader)
+    m_scriptRunner(_scriptRunner),
+    m_kinectPluginLoader(_kinectPluginLoader),
+    m_currentPluginIndex(-1)
+
 {
     BEGIN;
     ui->setupUi(this);
+
+    ui->warning->setVisible(false);
     setAttribute(Qt::WA_DeleteOnClose);
+
+    // hdd storage part
     ui->path->setText(dynamic_cast<HardDriveStorage*>(m_hardDriveStorage->storageImpl())->directoryPath());
     ui->firstImageSpinBox->setValue(m_hardDriveStorage->firstDelay());
     ui->nextImageSpinBox->setValue(m_hardDriveStorage->repeatableDelay());
@@ -30,20 +38,29 @@ SettingsDialog::SettingsDialog(Storage* _hardDriveStorage, Storage* _picasaStora
     ui->pluginComboBox->insertItems(0, plugins);
     if (plugins.length()) {
 	if (m_kinectPluginLoader->plugin()) {
-	    ui->pluginComboBox->setCurrentIndex(plugins.indexOf(m_kinectPluginLoader->plugin()->pluginName()));
+	    m_currentPluginIndex = plugins.indexOf(m_kinectPluginLoader->plugin()->pluginName());
 	} else {
-	    ui->pluginComboBox->setCurrentIndex(0);
+	    m_currentPluginIndex = 0;
 	}
+	ui->pluginComboBox->setCurrentIndex(m_currentPluginIndex);
+	connect(ui->pluginComboBox, SIGNAL(currentIndexChanged(int)), SLOT(onKinectPluginChange(int)));
     } else {
 	ui->pluginComboBox->setDisabled(true);
     }
 
+    // picasa storage part
     ui->picasaStorageActive->setCheckState(m_picasaStorage->storageActive() ? Qt::Checked : Qt::Unchecked);
     ui->picasaFirstImageSpinBox->setValue(m_picasaStorage->firstDelay());
     ui->picasaNextImageSpinBox->setValue(m_picasaStorage->repeatableDelay());
     PicasaStorage* ps = dynamic_cast<PicasaStorage*>(m_picasaStorage->storageImpl());
     ui->picasaLogin->setText(ps->login());
     ui->picasaPassword->setText(ps->password());
+
+    // script runner part
+    ui->scriptLauncherActive->setCheckState(m_scriptRunner->storageActive() ? Qt::Checked : Qt::Unchecked);
+    ui->firstLaunchSpinBox->setValue(m_scriptRunner->firstDelay());
+    ui->nextLaunchSpinBox->setValue(m_scriptRunner->repeatableDelay());
+    ui->scriptPath->setText(dynamic_cast<ScriptRunner*>(m_scriptRunner->storageImpl())->appPath());
 
     QSettings settings;
     settings.beginGroup("Global");
@@ -115,11 +132,28 @@ void SettingsDialog::on_buttonBox_accepted()
     ps->saveToFile();
     if (ps->password().length() != 0)
 	ps->requestAuth();
+
+    m_scriptRunner->setStorageActive((bool)ui->scriptLauncherActive->checkState());
+    ScriptRunner* sr = dynamic_cast<ScriptRunner*>(m_scriptRunner->storageImpl());
+    if (m_scriptRunner->storageActive()) {
+	m_scriptRunner->setFirstDelay(ui->firstLaunchSpinBox->value());
+	m_scriptRunner->setRepeatableDelay(ui->nextLaunchSpinBox->value());
+	sr->setAppPath(ui->scriptPath->text());
+
+    }
+    m_scriptRunner->saveToFile();
+    sr->saveToFile();
+
+
     QSettings settings;
     settings.beginGroup("Global");
     QVariant var(ui->launchKinectAfterStart->isChecked());
     settings.setValue("start_after_launch", var); //read data is done in alarmtrayicons' ctor
     settings.endGroup();
+    if (m_currentPluginIndex != ui->pluginComboBox->currentIndex()) {
+	QProcess::startDetached(QApplication::applicationFilePath());
+	exit(12);
+    }
     close();
     END;
 }
@@ -145,4 +179,36 @@ void SettingsDialog::on_picasaStorageActive_toggled(bool checked)
     ui->picasaLogin->setEnabled(checked);
     ui->picasaPassword->setEnabled(checked);
     END;
+}
+
+void SettingsDialog::onKinectPluginChange(int index)
+{
+    BEGIN;
+    ui->warning->setVisible(index != m_currentPluginIndex);
+    END;
+}
+
+void SettingsDialog::on_scriptLauncherActive_toggled(bool checked)
+{
+    BEGIN;
+    ui->label_13->setEnabled(checked);
+    ui->label_14->setEnabled(checked);
+    ui->label_15->setEnabled(checked);
+    ui->label_16->setEnabled(checked);
+    ui->label_17->setEnabled(checked);
+    ui->nextLaunchSpinBox->setEnabled(checked);
+    ui->firstLaunchSpinBox->setEnabled(checked);
+    ui->scriptPath->setEnabled(checked);
+    ui->scriptPathChooser->setEnabled(checked);
+
+    END;
+}
+
+void SettingsDialog::on_scriptPathChooser_clicked()
+{
+    QString file = QFileDialog::getOpenFileName(this, tr("Choose script to run"), ui->scriptPath->text());
+    INFO(file);
+    if (!file.isEmpty()) {
+	ui->scriptPath->setText(file);
+    }
 }

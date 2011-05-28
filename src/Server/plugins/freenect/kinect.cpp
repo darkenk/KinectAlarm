@@ -51,6 +51,7 @@ quint8* Kinect::depthImage()
 
 void Kinect::videoCallback(freenect_device *dev, void *rgb, uint32_t timestamp)
 {
+    Q_UNUSED(timestamp);
     //qDebug() << Q_FUNC_INFO;
     QMutexLocker locker (&m_mutex);
     m_backVideoBuffer = m_midVideoBuffer;
@@ -63,6 +64,8 @@ void Kinect::videoCallback(freenect_device *dev, void *rgb, uint32_t timestamp)
 
 void Kinect::depthCallback(freenect_device *dev, void *depth, uint32_t timestamp)
 {
+    Q_UNUSED(dev);
+    Q_UNUSED(timestamp);
     QMutexLocker locker(&m_mutex);
     uint16_t* u_depth = (uint16_t*)depth;
     uint8_t val;

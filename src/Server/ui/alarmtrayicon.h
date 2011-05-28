@@ -5,6 +5,7 @@
 #include "harddrivestorage.h"
 #include "storage.h"
 #include "picasastorage.h"
+#include "scriptrunner.h"
 #include "kinectpluginloader.h"
 
 #include <QSystemTrayIcon>
@@ -45,6 +46,7 @@ private:
     KinectPluginLoader* m_kinectPluginLoader;
     Storage* m_hardDriveStorage;
     Storage* m_picasaStorage;
+    Storage* m_scriptRunner;
 
 
 };

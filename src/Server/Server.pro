@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     logic/harddrivestorage.cpp \
     logic/kinectpluginloader.cpp \
     logic/picasastorage.cpp \
-    logic/storage.cpp
+    logic/storage.cpp \
+    logic/scriptrunner.cpp
 
 HEADERS  += ui/mainwindow.h \
     interfaces/ikinectobserver.h \
@@ -36,7 +37,8 @@ HEADERS  += ui/mainwindow.h \
     logic/picasastorage.h \
     logic/storage.h \
     interfaces/ikinectstorage.h \
-    kinectglobal.h
+    kinectglobal.h \
+    logic/scriptrunner.h
 
 FORMS    += ui/mainwindow.ui \
     ui/settingsdialog.ui

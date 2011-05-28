@@ -74,6 +74,19 @@
       <string>Motion detection plugin</string>
      </property>
     </widget>
+    <widget class="QLabel" name="warning">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Switching plugins requires application restart</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="storageSettings">
     <attribute name="title">
@@ -263,14 +276,14 @@
    </widget>
    <widget class="QWidget" name="picasaSettings">
     <attribute name="title">
-     <string>PIcasa</string>
+     <string>Picasa</string>
     </attribute>
     <widget class="QCheckBox" name="picasaStorageActive">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>121</width>
+       <width>171</width>
        <height>23</height>
       </rect>
      </property>
@@ -278,7 +291,7 @@
       <string>Activate possibility to store images on Picasa service</string>
      </property>
      <property name="text">
-      <string>Active Picasa</string>
+      <string>Active Picasa Storage</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="picasaLogin">
@@ -460,6 +473,192 @@
      </property>
      <property name="echoMode">
       <enum>QLineEdit::Password</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="scriptLanucher">
+    <attribute name="title">
+     <string>Script Launcher</string>
+    </attribute>
+    <widget class="QSpinBox" name="firstLaunchSpinBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>95</y>
+       <width>81</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="minimum">
+      <number>100</number>
+     </property>
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+     <property name="singleStep">
+      <number>50</number>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="scriptLauncherActive">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>181</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Active Script Launcher</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="scriptPathChooser">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>60</y>
+       <width>92</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Choose</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="nextLaunchSpinBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>130</y>
+       <width>81</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="minimum">
+      <double>0.500000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>30.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.500000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>135</y>
+       <width>201</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Launch script next time after</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_14">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>91</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Place for storing images</string>
+     </property>
+     <property name="text">
+      <string>Script path</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>201</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Launch script first time after</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>135</y>
+       <width>64</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>sec</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_17">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>100</y>
+       <width>64</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>msec</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="scriptPath">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>281</width>
+       <height>27</height>
+      </rect>
      </property>
     </widget>
    </widget>

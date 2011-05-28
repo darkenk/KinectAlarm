@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
 
     AlarmTrayIcon alarmTrayIcon;
     alarmTrayIcon.show();
+    alarmTrayIcon.showMessage("KinectAlarm", "KinectAlarm has started");
 
     return a.exec();
 }

@@ -22,9 +22,11 @@ AlarmTrayIcon::AlarmTrayIcon(QObject *_parent) :
 {
     HardDriveStorage* hds = new HardDriveStorage(this);
     PicasaStorage* ps = new PicasaStorage(this);
+    ScriptRunner* sr = new ScriptRunner(this);
     connect(ps, SIGNAL(statusMessage(QString, QString)), SLOT(onMessageSignal(QString, QString)));
     m_hardDriveStorage = new Storage(m_kinectPluginLoader, hds,this);
     m_picasaStorage = new Storage(m_kinectPluginLoader, ps, this);
+    m_scriptRunner = new Storage(m_kinectPluginLoader, sr, this);
     connect(m_kinectPluginLoader, SIGNAL(newKinectEngine(IKinect*)), this, SLOT(onKinectPluginChange(IKinect*)));
     onKinectPluginChange(m_kinectPluginLoader->plugin());
 
@@ -87,7 +89,7 @@ void AlarmTrayIcon::onSettingsAction()
 {
     qDebug() << Q_FUNC_INFO;
     if (!m_settingsWindow) {
-	m_settingsWindow = new SettingsDialog(m_hardDriveStorage, m_picasaStorage, m_kinectPluginLoader);
+	m_settingsWindow = new SettingsDialog(m_hardDriveStorage, m_picasaStorage, m_scriptRunner, m_kinectPluginLoader);
 	m_settingsWindow->show();
     } else {
 	m_settingsWindow->show();

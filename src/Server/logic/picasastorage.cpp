@@ -21,8 +21,8 @@ PicasaStorage::PicasaStorage(QObject *parent) :
     m_accessManager(new QNetworkAccessManager),
     m_authRequest(0),
     m_albumRequest(0),
-    m_createAlbumRequest(0),
-    m_sendImageRequest(0)
+    m_sendImageRequest(0),
+    m_createAlbumRequest(0)
 {
     BEGIN
     loadFromFile();

@@ -55,6 +55,9 @@ quint8* OpenNIObject::rgbImage()
 
 bool OpenNIObject::startGenerating()
 {
+    if (!m_initialized) {
+	return false;
+    }
     m_imageGenerator->StartGenerating();
     m_timer->start();
     start();
@@ -63,6 +66,9 @@ bool OpenNIObject::startGenerating()
 
 void OpenNIObject::pauseGenerating()
 {
+    if (!m_initialized) {
+	return;
+    }
     m_context->StopGeneratingAll();
     m_imageGenerator->StopGenerating();
     m_timer->stop();
