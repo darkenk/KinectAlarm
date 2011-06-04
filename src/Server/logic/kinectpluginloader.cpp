@@ -7,6 +7,7 @@
 #include <QSettings>
 
 #include <QDebug>
+#include "kinectglobal.h"
 
 #define KINECT_ALARM_PLUGINS_PATH "KINECT_ALARM_PLUGINS_PATH"
 
@@ -21,7 +22,10 @@ KinectPluginLoader::KinectPluginLoader(QObject *parent) :
 
 KinectPluginLoader::~KinectPluginLoader()
 {
-
+    BEGIN;
+    if (m_kinect)
+	m_kinect->deinitialize();
+    END;
 }
 
 QList<QString> KinectPluginLoader::pluginsList()

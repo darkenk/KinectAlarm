@@ -152,7 +152,7 @@ void SettingsDialog::on_buttonBox_accepted()
     settings.endGroup();
     if (m_currentPluginIndex != ui->pluginComboBox->currentIndex()) {
 	QProcess::startDetached(QApplication::applicationFilePath());
-	exit(12);
+	QApplication::quit();
     }
     close();
     END;
