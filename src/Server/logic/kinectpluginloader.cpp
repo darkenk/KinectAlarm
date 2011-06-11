@@ -87,13 +87,15 @@ IKinect* KinectPluginLoader::setPlugin(QString _pluginName)
     if ((m_kinect) && (m_kinect->pluginName() == _pluginName))
 	return m_kinect;
 
-    if (m_kinect)
+    if (m_kinect) {
 	m_kinect->deinitialize();
-
-    m_kinect = newKinect;
-    emit newKinectEngine(m_kinect);
-    if (!m_kinect->initialize()) {
-	emit newKinectEngine(NULL);
+	m_kinect = newKinect;
+    } else {
+	m_kinect = newKinect;
+	emit newKinectEngine(m_kinect);
+	if (!m_kinect->initialize()) {
+	    emit newKinectEngine(NULL);
+	}
     }
     return m_kinect;
 }

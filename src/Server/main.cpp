@@ -1,6 +1,7 @@
 #include "alarmtrayicon.h"
 
 #include <QtGui/QApplication>
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -13,5 +14,6 @@ int main(int argc, char *argv[])
     alarmTrayIcon.show();
     alarmTrayIcon.showMessage("KinectAlarm", "KinectAlarm has started");
 
+    qDebug() << "applicationStarted";
     return a.exec();
 }

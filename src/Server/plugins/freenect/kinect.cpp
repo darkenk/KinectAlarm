@@ -19,6 +19,8 @@ Kinect::Kinect(QObject *parent) :
     QThread(parent)
 {
     if (!m_instance) {
+	m_dev = NULL;
+	m_ctx = NULL;
 	m_dataProcessor = new DataProcessor();
 	connect(m_dataProcessor, SIGNAL(nonZerosPixelsChanged(int)), SLOT(onZerosCount(int)));
 	m_die = false;
@@ -29,6 +31,9 @@ Kinect::Kinect(QObject *parent) :
 Kinect::~Kinect()
 {
     //TODO: check if the memeory is released there
+    BEGIN;
+    deinitialize();
+    END;
 }
 
 
@@ -163,6 +168,7 @@ bool Kinect::initialize()
 
 void Kinect::deinitialize()
 {
+    BEGIN;
     pauseGenerating();
     if (m_dev) {
 	freenect_close_device(m_dev);
@@ -182,6 +188,7 @@ void Kinect::deinitialize()
     delete m_midDepth;
     m_midDepth = 0;
     m_initialized = false;
+    END;
 }
 
 quint32 Kinect::rgbImageWidth()

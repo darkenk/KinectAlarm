@@ -17,7 +17,8 @@ OpenNIObject::OpenNIObject(QObject *parent) :
     m_moveDetected(false),
     m_nextShot(true),
     m_timer(new QTimer),
-    m_initialized(false)
+    m_initialized(false),
+    m_context(NULL)
 {
     m_timer->setSingleShot(false);
     m_timer->setInterval(50);
@@ -233,6 +234,7 @@ QString OpenNIObject::pluginName()
 
 void OpenNIObject::deinitialize()
 {
+    BEGIN;
     pauseGenerating();
     if (m_context) {
 	m_context->Shutdown();
@@ -266,6 +268,7 @@ void OpenNIObject::deinitialize()
     delete m_sceneMetaData;
     m_sceneMetaData = NULL;
     m_initialized = false;
+    END;
 }
 
 bool OpenNIObject::isRunning()
